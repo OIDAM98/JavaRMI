@@ -1,3 +1,12 @@
+/**
+ * General information about a client:
+ * Name
+ * Address
+ * Email
+ * Phone number
+ * Nickname
+ */
+
 public class Cliente {
 
     String nombre;

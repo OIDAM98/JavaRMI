@@ -1,3 +1,11 @@
+/**
+ * Information about products on sale:
+ * - Name of product (also serves as key)
+ * - Small description
+ * - Initial price
+ * - Date and time when bid closes.
+ */
+
 import java.io.Serializable;
 import java.util.Date;
 

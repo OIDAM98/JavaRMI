@@ -1,3 +1,11 @@
+/**
+ * Information about history of offers for each item:
+ * - Nickname of client who made the offer
+ * - Product key
+ * - Date and time og the offer
+ * - Amount offered
+ */
+
 import java.util.Date;
 
 public class Historico {
