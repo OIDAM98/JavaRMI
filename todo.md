@@ -18,7 +18,7 @@ Todo list for RMI
 - [ ] Implement selected database
     * Backup plan: Text file (maybe csv)
 - [ ] Make server interface (extends Remote)
-- [ ] Make server servarnt (implement previous point)
+- [ ] Make server servant (implement previous point)
 - [ ] Make server propagate changes to ALL clients
     * Connect controller with server => server has list of controllers
 
