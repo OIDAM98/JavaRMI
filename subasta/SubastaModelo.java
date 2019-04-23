@@ -3,7 +3,7 @@ package subasta;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class SubastaModelo {
+public class SubastaModelo implements Servidor {
 
     Hashtable<String, Cliente> usuarios;
     Hashtable<String, Producto> productos;
