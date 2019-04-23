@@ -6,7 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -18,7 +18,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionListener;
 
 public class SubastaVista {
 
@@ -58,7 +57,6 @@ public class SubastaVista {
 
         controller = new SubastaControlador(this);
 
-        // JFrame.setDefaultLookAndFeelDecorated( true );
         Container panel;
 
         principal = new JFrame("Cliente Subasta");
@@ -94,13 +92,6 @@ public class SubastaVista {
         listaScroller.setPreferredSize(new Dimension(250, 80));
         panel.add(listaScroller, BorderLayout.CENTER);
 
-        // producto = new JTextField();
-        // precioInicial = new JTextField();
-        // panel.add(new JLabel("Producto a ofrecer"));
-        // panel.add(producto);
-        // panel.add(new JLabel("Precio inicial"));
-        // panel.add(precioInicial);
-
         JPanel south = new JPanel();
         south.setLayout(new BorderLayout());
         JPanel productoInfo = new JPanel();
@@ -116,7 +107,8 @@ public class SubastaVista {
         descripcionProd.setEditable(false);
         descripcionProd.setLineWrap(true);
         descripcionProd.setWrapStyleWord(true);
-        //scroll.setPreferredSize(new Dimension(usuario.getWidth(), usuario.getHeight()));
+        // scroll.setPreferredSize(new Dimension(usuario.getWidth(),
+        // usuario.getHeight()));
 
         productoInfo.add(obtenerLista);
         productoInfo.add(scroll);
@@ -138,23 +130,55 @@ public class SubastaVista {
 
         initializatePanels();
 
-        asignarActionListener(controller);
-        asignarListSelectionListener(controller);
-    }
+        conectar.addActionListener(e -> {
+            try {
+                controller.connectUser();
+            } catch (RemoteException ex) {
+                System.out.println("Error al conectar usuario");
+            }
+        });
+        salir.addActionListener(e -> {
+            try {
+                controller.disconnectUser();
+            } catch (RemoteException ex) {
+                System.out.println("Error al desconectar usuario");
+            }
+        });
+        ponerALaVenta.addActionListener(e -> {
+            try {
+                controller.putOnSale();
+            } catch (RemoteException ex) {
+                System.out.println("Error al poner en venta un producto");
+            }
+        });
+        obtenerLista.addActionListener(e -> {
+            try {
+                controller.updateProductList();
+            } catch (RemoteException ex) {
+                System.out.println("Error al actualizar lista");
+            }
+        });
+        ofrecer.addActionListener(e -> {
+            try {
+                controller.offerOnProduct();
+            } catch (RemoteException ex) {
+                System.out.println("Error al ofrecer en producto");
+            }
+        });
+        lista.addListSelectionListener(e -> {
+            try {
 
-    public void asignarActionListener(ActionListener controlador) {
+                if (e.getValueIsAdjusting() == false) {
+                    JList lista = (JList) e.getSource();
+                    Producto item = (Producto) lista.getSelectedValue();
+                    controller.changeDescription(item);
+        
+                }
+            } catch (RemoteException ex) {
+                System.out.println("Error al cambiar la descripcion");
+            }
+        });
 
-        conectar.addActionListener(controlador);
-        salir.addActionListener(controlador);
-        ponerALaVenta.addActionListener(controlador);
-        obtenerLista.addActionListener(controlador);
-        ofrecer.addActionListener(controlador);
-
-    }
-
-    public void asignarListSelectionListener(ListSelectionListener controlador) {
-
-        lista.addListSelectionListener(controlador);
     }
 
     private void initializatePanels() {
@@ -369,7 +393,6 @@ public class SubastaVista {
     public void desplegarDescripcion(String context) {
 
         descripcionProd.setText(context);
-        
 
     }
 
