@@ -1,5 +1,13 @@
 package subasta;
 
+import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionListener;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -7,13 +15,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import javax.swing.event.ListSelectionListener;
 
 public class SubastaVista {
@@ -42,6 +46,7 @@ public class SubastaVista {
 
     DefaultComboBoxModel productos;
     JLabel precioActual;
+    JTextArea descripcionProd;
     JList lista;
     JButton conectar;
     JButton salir;
@@ -58,27 +63,28 @@ public class SubastaVista {
 
         principal = new JFrame("Cliente Subasta");
         panel = principal.getContentPane();
-        panel.setLayout(new GridLayout(0, 2));
+        panel.setLayout(new BorderLayout());
+        // panel.setLayout(new GridLayout(0, 2));
+
+        JPanel north = new JPanel();
+        north.setLayout(new BorderLayout());
+        JPanel usuarioDatos = new JPanel();
+        usuarioDatos.setLayout(new GridLayout(1, 2));
+        JPanel accionesUsuario = new JPanel();
+        accionesUsuario.setLayout(new GridLayout(2, 1));
 
         usuario = new JTextField();
-        panel.add(new JLabel("Nombre del usuario"));
-        panel.add(usuario);
+        usuarioDatos.add(new JLabel("Nombre del usuario"));
+        usuarioDatos.add(usuario);
+
         conectar = new JButton("Conectar");
-
-        salir = new JButton("Salir");
-        panel.add(conectar);
-        panel.add(salir);
-
-        producto = new JTextField();
-        precioInicial = new JTextField();
-        panel.add(new JLabel("Producto a ofrecer"));
-        panel.add(producto);
-        panel.add(new JLabel("Precio inicial"));
-        panel.add(precioInicial);
-
+        accionesUsuario.add(conectar);
         ponerALaVenta = new JButton("Poner a la venta");
-        panel.add(ponerALaVenta);
-        panel.add(new JLabel());
+        accionesUsuario.add(ponerALaVenta);
+
+        north.add(usuarioDatos, BorderLayout.NORTH);
+        north.add(accionesUsuario, BorderLayout.SOUTH);
+        panel.add(north, BorderLayout.NORTH);
 
         productos = new DefaultComboBoxModel();
         lista = new JList(productos); // data has type Object[]
@@ -86,18 +92,45 @@ public class SubastaVista {
         lista.setLayoutOrientation(JList.VERTICAL);
         JScrollPane listaScroller = new JScrollPane(lista);
         listaScroller.setPreferredSize(new Dimension(250, 80));
-        obtenerLista = new JButton("Obtener lista");
-        panel.add(obtenerLista);
-        panel.add(listaScroller);
+        panel.add(listaScroller, BorderLayout.CENTER);
 
-        precioActual = new JLabel();
-        panel.add(new JLabel("Precio actual"));
-        panel.add(precioActual);
+        // producto = new JTextField();
+        // precioInicial = new JTextField();
+        // panel.add(new JLabel("Producto a ofrecer"));
+        // panel.add(producto);
+        // panel.add(new JLabel("Precio inicial"));
+        // panel.add(precioInicial);
+
+        JPanel south = new JPanel();
+        south.setLayout(new BorderLayout());
+        JPanel productoInfo = new JPanel();
+        productoInfo.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 5));
+        productoInfo.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        JPanel ofrecerProd = new JPanel();
+        ofrecerProd.setLayout(new GridLayout(1, 2));
+
+        obtenerLista = new JButton("Obtener lista");
+        productoInfo.add(new JLabel("Descripcion: "));
+        descripcionProd = new JTextArea();
+        JScrollPane scroll = new JScrollPane(descripcionProd);
+        descripcionProd.setEditable(false);
+        descripcionProd.setLineWrap(true);
+        descripcionProd.setWrapStyleWord(true);
+        //scroll.setPreferredSize(new Dimension(usuario.getWidth(), usuario.getHeight()));
+
+        productoInfo.add(obtenerLista);
+        productoInfo.add(scroll);
+        south.add(productoInfo, BorderLayout.NORTH);
 
         monto = new JTextField();
         ofrecer = new JButton("Ofrecer");
-        panel.add(ofrecer);
-        panel.add(monto);
+        ofrecerProd.add(ofrecer);
+        ofrecerProd.add(monto);
+        south.add(ofrecerProd, BorderLayout.CENTER);
+
+        salir = new JButton("Salir");
+        south.add(salir, BorderLayout.SOUTH);
+        panel.add(south, BorderLayout.SOUTH);
 
         principal.setSize(400, 400);
         principal.setVisible(true);
@@ -142,13 +175,15 @@ public class SubastaVista {
 
         productPanel = new JPanel();
         productPanel.setLayout(new GridLayout(0, 2));
+        producto = new JTextField();
+        productPanel.add(new JLabel("Nombre:"));
+        productPanel.add(producto);
+        precioInicial = new JTextField();
+        productPanel.add(new JLabel("Precio inicial:"));
+        productPanel.add(precioInicial);
         descripcion = new JTextField();
         productPanel.add(new JLabel("Descripcion:"));
         productPanel.add(descripcion);
-        //precioInicial = new JTextField();
-        //productPanel.add(new JLabel("Precio inicial:"));
-        //productPanel.add(precioInicial);
-
         productPanel.add(new JLabel("Fecha de Cierre"));
         productPanel.add(new JLabel(""));
 
@@ -310,6 +345,7 @@ public class SubastaVista {
     }
 
     public void resetProductPanel() {
+        producto.setText("");
         descripcion.setText("");
         precioInicial.setText("");
         año.setText("");
@@ -318,7 +354,6 @@ public class SubastaVista {
         hora.setText("");
         minuto.setText("");
     }
-
 
     public void reinicializaListaProductos() {
 
@@ -331,9 +366,11 @@ public class SubastaVista {
 
     }
 
-    public void desplegarPrecio(String precio) {
+    public void desplegarDescripcion(String context) {
 
-        precioActual.setText(precio);
+        descripcionProd.setText(context);
+        
+
     }
 
     public float getMontoOfrecido() {
@@ -358,8 +395,7 @@ public class SubastaVista {
     }
 
     public static void main(String... args) {
-        SubastaVista vista;
-        vista = new SubastaVista();
+        new SubastaVista();
     }
 
 }
