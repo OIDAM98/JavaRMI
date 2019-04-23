@@ -1,3 +1,6 @@
+import subasta.SubastaControlador;
+import subasta.SubastaModelo;
+import subasta.SubastaVista;
 
 public class Principal {
 
@@ -13,5 +16,6 @@ public class Principal {
 
         vista.asignarActionListener( controlador );
         vista.asignarListSelectionListener( controlador );
+
     }
 }

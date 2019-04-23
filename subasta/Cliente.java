@@ -1,3 +1,5 @@
+package subasta;
+
 /**
  * General information about a client:
  * Name

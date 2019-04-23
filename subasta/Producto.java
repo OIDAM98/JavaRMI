@@ -1,3 +1,5 @@
+package subasta;
+
 /**
  * Information about products on sale:
  * - Name of product (also serves as key)
@@ -6,19 +8,22 @@
  * - Date and time when bid closes.
  */
 
-import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-public class Producto implements Serializable {
+public class Producto {
 
     String vendedor;
     String producto;
     String descripcion;
     float precioInicial;
     float precioActual;
-    Date fechaCierre;
+    LocalDateTime fechaCierre;
+    private static final String DATE_FORMATTER = "yyyy-MM-dd HH:mm:ss";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMATTER);
 
-    public Producto(String v, String p, String d, float pi, Date fc ) {
+
+    public Producto(String v, String p, String d, float pi, LocalDateTime fc ) {
 
         vendedor = v;
         producto = p;
@@ -46,5 +51,10 @@ public class Producto implements Serializable {
     public float getPrecioActual() {
 
         return precioActual;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %.2f %s", producto, precioActual, fechaCierre.format(FORMATTER) );
     }
 }

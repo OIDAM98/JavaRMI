@@ -2,12 +2,12 @@ Todo list for RMI
 ===
 
 ## Model Classes
-* Histórico
-* Cliente
-* Producto
+* subasta.Oferta
+* subasta.Cliente
+* subasta.Producto
 - [ ] Add comments to each one
 - [ ] Getters + Setters
-- [ ] Only those...?
+- [x] Only those...?
 
 ## Server
 
@@ -23,13 +23,13 @@ Todo list for RMI
     * Connect controller with server => server has list of controllers
 
 ## Controller
-- [ ] Fix methods involved with Model Classes
+- [x] Fix methods involved with Model Classes
 - [ ] Connect with server
-- [ ] Connect with GUI
+- [x] Connect with GUI
 
 ## Client (GUI)
 - [ ] Modify current GUI to display added information
-- [ ] Add login view/window
+- [x] Add login view/window
 
 ## After
 - [ ] Make demo

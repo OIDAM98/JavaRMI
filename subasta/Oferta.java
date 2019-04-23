@@ -1,3 +1,5 @@
+package subasta;
+
 /**
  * Information about history of offers for each item:
  * - Nickname of client who made the offer
@@ -6,21 +8,15 @@
  * - Amount offered
  */
 
-import java.util.Date;
+public class Oferta {
 
-public class Historico {
+    Cliente comprador;
+    Producto producto;
 
-    String comprador;
-    String producto;
-    float monto;
-    Date fecha;
-
-    public Historico(String c, String p, Date d, float m ) {
+    public Oferta(Cliente c, Producto p) {
 
         comprador = c;
         producto = p;
-        fecha = d;
-        monto = m;
 
-   }
+    }
 }
