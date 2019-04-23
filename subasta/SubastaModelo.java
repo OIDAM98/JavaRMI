@@ -1,5 +1,8 @@
 package subasta;
 
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -72,10 +75,25 @@ public class SubastaModelo implements Servidor {
 
     public Vector obtieneCatalogo() {
 
-        Vector resultado;
+        return new Vector(productos.values());
 
-        resultado = new Vector(productos.values());
-
-        return resultado;
     }
+
+    public static void main(String... args) {
+        try {
+
+            SubastaModelo obj = new SubastaModelo();
+            Servidor stub = (Servidor) UnicastRemoteObject.exportObject(obj, 0);
+
+            Registry registry = LocateRegistry.getRegistry();
+            registry.bind("subasta", stub);
+
+            System.out.println("Server ready");
+        }
+        catch (Exception e) {
+            System.err.println("Server exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+
 }

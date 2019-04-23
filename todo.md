@@ -6,7 +6,7 @@ Todo list for RMI
 * subasta.Cliente
 * subasta.Producto
 - [ ] Add comments to each one
-- [ ] Getters + Setters
+- [ ] Getters
 - [x] Only those...?
 
 ## Server
@@ -17,14 +17,14 @@ Todo list for RMI
     * Apache Derby
 - [ ] Implement selected database
     * Backup plan: Text file (maybe csv)
-- [ ] Make server interface (extends Remote)
-- [ ] Make server servant (implement previous point)
+- [x] Make server interface (extends Remote)
+- [x] Make server servant (implement previous point)
 - [ ] Make server propagate changes to ALL clients
     * Connect controller with server => server has list of controllers
 
 ## Controller
 - [x] Fix methods involved with Model Classes
-- [ ] Connect with server
+- [x] Connect with server
 - [x] Connect with GUI
 
 ## Client (GUI)

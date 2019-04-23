@@ -1,6 +1,5 @@
 package subasta;
 
-import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,6 +18,8 @@ import javax.swing.event.ListSelectionListener;
 
 public class SubastaVista {
 
+    SubastaControlador controller;
+
     JFrame principal;
 
     JTextField usuario;
@@ -29,6 +30,7 @@ public class SubastaVista {
     JPanel userPanel;
 
     JTextField producto;
+    JTextField monto;
     JTextField descripcion;
     JTextField precioInicial;
     JTextField año;
@@ -38,7 +40,6 @@ public class SubastaVista {
     JTextField minuto;
     JPanel productPanel;
 
-    JTextField monto;
     DefaultComboBoxModel productos;
     JLabel precioActual;
     JList lista;
@@ -49,6 +50,8 @@ public class SubastaVista {
     JButton ofrecer;
 
     public SubastaVista() {
+
+        controller = new SubastaControlador(this);
 
         // JFrame.setDefaultLookAndFeelDecorated( true );
         Container panel;
@@ -101,6 +104,9 @@ public class SubastaVista {
         principal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         initializatePanels();
+
+        asignarActionListener(controller);
+        asignarListSelectionListener(controller);
     }
 
     public void asignarActionListener(ActionListener controlador) {
@@ -110,6 +116,7 @@ public class SubastaVista {
         ponerALaVenta.addActionListener(controlador);
         obtenerLista.addActionListener(controlador);
         ofrecer.addActionListener(controlador);
+
     }
 
     public void asignarListSelectionListener(ListSelectionListener controlador) {
@@ -349,4 +356,10 @@ public class SubastaVista {
 
         return (Producto) lista.getSelectedValue();
     }
+
+    public static void main(String... args) {
+        SubastaVista vista;
+        vista = new SubastaVista();
+    }
+
 }

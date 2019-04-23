@@ -1,6 +1,9 @@
 package subasta;
 
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.time.LocalDateTime;
 import java.awt.event.ActionEvent;
 
@@ -16,12 +19,18 @@ import javax.swing.event.ListSelectionEvent;
 public class SubastaControlador implements ActionListener, ListSelectionListener {
 
     SubastaVista vista;
-    SubastaModelo modelo;
+    Servidor modelo;
     Hashtable listaConPrecios;
 
-    public SubastaControlador(SubastaVista v, SubastaModelo m) {
+    public SubastaControlador(SubastaVista v) {
         vista = v;
-        modelo = m;
+        try {
+            Registry registry = LocateRegistry.getRegistry();
+            modelo = (Servidor) registry.lookup("subasta");
+        }
+        catch (Exception e) {
+            System.err.println("Server error");
+        }
     }
 
     public void actionPerformed(ActionEvent evento) {
@@ -40,78 +49,108 @@ public class SubastaControlador implements ActionListener, ListSelectionListener
         } else if (evento.getActionCommand().equals("Conectar")) { //Connect to server
             usuario = vista.getUsuario();
             System.out.println("Registrarse como usuario: " + usuario);
-            if (modelo.existeUsuario(usuario)) {
-                int result = JOptionPane.showConfirmDialog(null, vista.getUserPanel(),
-                        "Dar de alta un usuario", JOptionPane.OK_CANCEL_OPTION);
-                if (result == JOptionPane.OK_OPTION) {
-                    String direccion = vista.getDireccion();
-                    String email = vista.getEmail();
-                    String telefono = vista.getTelefono();
-                    String nickname = vista.getNickname();
-                    vista.resetUserPanel();
-                    Cliente nuevoCliente = new Cliente(usuario, direccion, email, telefono, nickname);
-                    printy = String.format("%s %s %s %s %s", usuario, direccion, email, telefono, nickname);
-                    System.out.println(printy);
 
-                    if (modelo.registraUsuario(usuario, nuevoCliente)) {
-                        JOptionPane.showMessageDialog(null, "Cliente dado de alta con éxito!", "Dar de alta cliente",
-                                JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Hubo un error al dar de alta el cliente.",
-                                "Dar de alta cliente", JOptionPane.ERROR_MESSAGE);
+            try {
+
+                if (modelo.existeUsuario(usuario)) {
+                    int result = JOptionPane.showConfirmDialog(null, vista.getUserPanel(),
+                            "Dar de alta un usuario", JOptionPane.OK_CANCEL_OPTION);
+                    if (result == JOptionPane.OK_OPTION) {
+                        String direccion = vista.getDireccion();
+                        String email = vista.getEmail();
+                        String telefono = vista.getTelefono();
+                        String nickname = vista.getNickname();
+                        vista.resetUserPanel();
+                        Cliente nuevoCliente = new Cliente(usuario, direccion, email, telefono, nickname);
+                        printy = String.format("%s %s %s %s %s", usuario, direccion, email, telefono, nickname);
+                        System.out.println(printy);
+
+                        if (modelo.registraUsuario(usuario, nuevoCliente)) {
+                            JOptionPane.showMessageDialog(null, "Cliente dado de alta con éxito!", "Dar de alta cliente",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Hubo un error al dar de alta el cliente.",
+                                    "Dar de alta cliente", JOptionPane.ERROR_MESSAGE);
+                        }
+
                     }
-
                 }
+
             }
+            catch (RemoteException ex) {
+                System.out.println("Fallo en el servidor");
+            }
+
 
         } else if (evento.getActionCommand().equals("Poner a la venta")) { //Offer a product
             usuario = vista.getUsuario();
             producto = vista.getProducto();
             System.out.println("Haciendo oferta del producto: " + producto);
-            if (true) {
-                int result = JOptionPane.showConfirmDialog(null, vista.getProductPanel(),
-                        "Datos para ofrecer producto", JOptionPane.OK_CANCEL_OPTION);
 
-                if (result == JOptionPane.OK_OPTION) {
-                    monto = vista.getPrecioInicial();
-                    String descripcion = vista.getDescripcionProducto();
-                    int año = vista.getAñoOferta();
-                    int mes = vista.getMesOferta() ;
-                    int dia = vista.getDiaOferta();
-                    int hora = vista.getHoraOferta();
-                    int minutos = vista.getMinutoOferta();
-                    vista.resetProductPanel();
-                    LocalDateTime fecha = LocalDateTime.of(año, mes, dia, hora, minutos);
-                    Producto ofrecer = new Producto(usuario, producto, descripcion, monto, fecha);
+            try {
 
-                    if (modelo.agregaProductoALaVenta(producto, ofrecer)) {
-                        JOptionPane.showMessageDialog(null, "Producto ofrecido con éxito!", "Ofrecer producto",
-                                JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Hubo un error al ofrecer el producto.",
-                                "Ofrecer producto", JOptionPane.ERROR_MESSAGE);
+                if (modelo.existeProducto(producto)) {
+                    int result = JOptionPane.showConfirmDialog(null, vista.getProductPanel(),
+                            "Datos para ofrecer producto", JOptionPane.OK_CANCEL_OPTION);
+
+                    if (result == JOptionPane.OK_OPTION) {
+                        monto = vista.getPrecioInicial();
+                        String descripcion = vista.getDescripcionProducto();
+                        int año = vista.getAñoOferta();
+                        int mes = vista.getMesOferta() ;
+                        int dia = vista.getDiaOferta();
+                        int hora = vista.getHoraOferta();
+                        int minutos = vista.getMinutoOferta();
+                        vista.resetProductPanel();
+                        LocalDateTime fecha = LocalDateTime.of(año, mes, dia, hora, minutos);
+                        Producto ofrecer = new Producto(usuario, producto, descripcion, monto, fecha);
+
+                        if (modelo.agregaProductoALaVenta(producto, ofrecer)) {
+                            JOptionPane.showMessageDialog(null, "Producto ofrecido con éxito!", "Ofrecer producto",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Hubo un error al ofrecer el producto.",
+                                    "Ofrecer producto", JOptionPane.ERROR_MESSAGE);
+                        }
+
                     }
-
                 }
+
             }
+            catch (RemoteException ex) {
+                System.out.println("Fallo en el servidor");
+            }
+
 
         } else if (evento.getActionCommand().equals("Obtener lista")) { //Get catalog of products
-            Vector<Producto> lista = modelo.obtieneCatalogo();
-            Enumeration it;
-            Producto info;
-            listaConPrecios = new Hashtable();
-            vista.reinicializaListaProductos();
-            it = lista.elements();
-            while (it.hasMoreElements()) {
-                info = (Producto) it.nextElement();
-                listaConPrecios.put(info.producto, String.valueOf(info.precioActual));
-                vista.agregaProducto(info);
+            try {
+
+                Vector<Producto> lista = modelo.obtieneCatalogo();
+                Enumeration it;
+                Producto info;
+                listaConPrecios = new Hashtable();
+                vista.reinicializaListaProductos();
+                it = lista.elements();
+                while (it.hasMoreElements()) {
+                    info = (Producto) it.nextElement();
+                    listaConPrecios.put(info.producto, String.valueOf(info.precioActual));
+                    vista.agregaProducto(info);
+                }
+
+            }
+            catch (RemoteException ex) {
+                System.out.println("Fallo en el servidor");
             }
         } else if (evento.getActionCommand().equals("Ofrecer")) { //Bid for a product
-            Producto offer = vista.getProductoSeleccionado();
-            monto = vista.getMontoOfrecido();
-            usuario = vista.getUsuario();
-            modelo.agregaOferta(usuario, offer.producto, monto);
+            try{
+                Producto offer = vista.getProductoSeleccionado();
+                monto = vista.getMontoOfrecido();
+                usuario = vista.getUsuario();
+                modelo.agregaOferta(usuario, offer.producto, monto);
+            }
+            catch (RemoteException ex) {
+                System.err.println("Fallo en el servidor");
+            }
         }
     }
 

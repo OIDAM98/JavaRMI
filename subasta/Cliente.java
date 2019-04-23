@@ -1,5 +1,7 @@
 package subasta;
 
+import java.io.Serializable;
+
 /**
  * General information about a client:
  * Name
@@ -9,7 +11,7 @@ package subasta;
  * Nickname
  */
 
-public class Cliente {
+public class Cliente implements Serializable {
 
     String nombre;
     String direccion;

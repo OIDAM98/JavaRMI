@@ -8,10 +8,11 @@ package subasta;
  * - Date and time when bid closes.
  */
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Producto {
+public class Producto implements Serializable {
 
     String vendedor;
     String producto;
