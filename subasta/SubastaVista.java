@@ -62,7 +62,6 @@ public class SubastaVista {
         principal = new JFrame("Cliente Subasta");
         panel = principal.getContentPane();
         panel.setLayout(new BorderLayout());
-        // panel.setLayout(new GridLayout(0, 2));
 
         JPanel north = new JPanel();
         north.setLayout(new BorderLayout());
@@ -124,64 +123,18 @@ public class SubastaVista {
         south.add(salir, BorderLayout.SOUTH);
         panel.add(south, BorderLayout.SOUTH);
 
-        principal.setSize(400, 400);
+        createUserPanel();
+        createProductPanel();
+        initializeListeners();
+
+        principal.setSize(500, 500);
+        principal.setMinimumSize(new Dimension(500, 500));
         principal.setVisible(true);
         principal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        initializatePanels();
-
-        conectar.addActionListener(e -> {
-            try {
-                controller.connectUser();
-            } catch (RemoteException ex) {
-                System.out.println("Error al conectar usuario");
-            }
-        });
-        salir.addActionListener(e -> {
-            try {
-                controller.disconnectUser();
-            } catch (RemoteException ex) {
-                System.out.println("Error al desconectar usuario");
-            }
-        });
-        ponerALaVenta.addActionListener(e -> {
-            try {
-                controller.putOnSale();
-            } catch (RemoteException ex) {
-                System.out.println("Error al poner en venta un producto");
-            }
-        });
-        obtenerLista.addActionListener(e -> {
-            try {
-                controller.updateProductList();
-            } catch (RemoteException ex) {
-                System.out.println("Error al actualizar lista");
-            }
-        });
-        ofrecer.addActionListener(e -> {
-            try {
-                controller.offerOnProduct();
-            } catch (RemoteException ex) {
-                System.out.println("Error al ofrecer en producto");
-            }
-        });
-        lista.addListSelectionListener(e -> {
-            try {
-
-                if (e.getValueIsAdjusting() == false) {
-                    JList lista = (JList) e.getSource();
-                    Producto item = (Producto) lista.getSelectedValue();
-                    controller.changeDescription(item);
-        
-                }
-            } catch (RemoteException ex) {
-                System.out.println("Error al cambiar la descripcion");
-            }
-        });
-
     }
 
-    private void initializatePanels() {
+    private void createUserPanel() {
         userPanel = new JPanel();
         userPanel.setLayout(new GridLayout(0, 2));
         direccion = new JTextField();
@@ -196,6 +149,9 @@ public class SubastaVista {
         nickname = new JTextField();
         userPanel.add(new JLabel("Nickname:"));
         userPanel.add(nickname);
+    }
+
+    private void createProductPanel() {
 
         productPanel = new JPanel();
         productPanel.setLayout(new GridLayout(0, 2));
@@ -230,6 +186,63 @@ public class SubastaVista {
         minuto = new JTextField();
         productPanel.add(new JLabel("Minutos (0 a 59):"));
         productPanel.add(minuto);
+    }
+
+    private void initializeListeners() {
+
+        conectar.addActionListener(e -> {
+            try {
+                controller.connectUser();
+            } catch (RemoteException ex) {
+                System.out.println("Error al conectar usuario");
+            }
+        });
+
+        salir.addActionListener(e -> {
+            try {
+                controller.disconnectUser();
+            } catch (RemoteException ex) {
+                System.out.println("Error al desconectar usuario");
+            }
+        });
+
+        ponerALaVenta.addActionListener(e -> {
+            try {
+                controller.putOnSale();
+            } catch (RemoteException ex) {
+                System.out.println("Error al poner en venta un producto");
+            }
+        });
+
+        obtenerLista.addActionListener(e -> {
+            try {
+                controller.updateProductList();
+            } catch (RemoteException ex) {
+                System.out.println("Error al actualizar lista");
+            }
+        });
+
+        ofrecer.addActionListener(e -> {
+            try {
+                controller.offerOnProduct();
+            } catch (RemoteException ex) {
+                System.out.println("Error al ofrecer en producto");
+            }
+        });
+
+        lista.addListSelectionListener(e -> {
+            try {
+
+                if (e.getValueIsAdjusting() == false) {
+                    JList lista = (JList) e.getSource();
+                    Producto item = (Producto) lista.getSelectedValue();
+                    controller.changeDescription(item);
+
+                }
+            } catch (RemoteException ex) {
+                System.out.println("Error al cambiar la descripcion");
+            }
+        });
     }
 
     public JPanel getUserPanel() {
