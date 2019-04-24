@@ -1,9 +1,12 @@
 package subasta;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 public class SubastaModelo implements Servidor {
@@ -11,12 +14,45 @@ public class SubastaModelo implements Servidor {
     Hashtable<String, Cliente> usuarios;
     Hashtable<String, Producto> productos;
     Hashtable<String, Oferta> ofertas;
+    List<Controller> clients;
 
     public SubastaModelo() {
 
         usuarios = new Hashtable();
         productos = new Hashtable();
         ofertas = new Hashtable();
+        clients = new ArrayList<>();
+
+    }
+
+    public void updateClients() {
+        if(!obtieneCatalogo().isEmpty()) {
+            Controller current = null;
+            try {
+                for(Controller c : clients) {
+                    c.updateView();
+                    System.out.println("se actualizo alguien");
+                    current = c;
+                }
+            }
+            catch (RemoteException ex) {
+                System.out.println("Hubo un error al actualizar cliente " + current);
+                this.unsubscribe(current);
+            }
+        }
+    }
+
+    public void subscribe(Controller c) {
+        clients.add(c);
+        System.out.println("Se suscribio alguien");
+        System.out.println(clients);
+        updateClients();
+    }
+
+    public void unsubscribe(Controller c) {
+        System.out.println("removiendo cliente " + clients.indexOf(c));
+        clients.remove(c);
+        System.out.println("Un cliente se desconecto");
     }
 
     public boolean registraUsuario(String nombre, Cliente client) {
@@ -33,7 +69,7 @@ public class SubastaModelo implements Servidor {
     }
 
     public boolean existeUsuario(String nombre) {
-        return !usuarios.containsKey(nombre);
+        return usuarios.containsKey(nombre);
     }
 
     public boolean agregaProductoALaVenta( String producto, Producto vender) {
@@ -41,10 +77,10 @@ public class SubastaModelo implements Servidor {
 
             System.out.println("Agregando un nuevo producto: " + producto);
             productos.put(producto, vender);
+            this.updateClients();
             return true;
 
         } else
-
             return false;
     }
 
@@ -62,6 +98,7 @@ public class SubastaModelo implements Servidor {
             if (infoProd.actualizaPrecio(monto)) {
 
                 ofertas.put(producto + comprador, new Oferta(user, infoProd));
+                this.updateClients();
                 return true;
 
             } else

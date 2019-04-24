@@ -7,8 +7,6 @@ public interface Controller extends Remote {
 
   void connectUser() throws RemoteException;
 
-  void disconnectUser() throws RemoteException;
-
   void putOnSale() throws RemoteException;
 
   void updateProductList() throws RemoteException;

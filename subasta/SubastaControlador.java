@@ -3,6 +3,7 @@ package subasta;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -10,13 +11,13 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
-public class SubastaControlador implements Controller {
+public class SubastaControlador extends UnicastRemoteObject implements Controller {
 
     SubastaVista vista;
     Servidor modelo;
     Hashtable<String, String> listaDescripcion;
 
-    public SubastaControlador(SubastaVista v) {
+    public SubastaControlador(SubastaVista v) throws RemoteException {
         vista = v;
         try {
             Registry registry = LocateRegistry.getRegistry();
@@ -26,17 +27,13 @@ public class SubastaControlador implements Controller {
         }
     }
 
-    public void disconnectUser() throws RemoteException {
-        System.exit(1);
-    }
-
     public void connectUser() throws RemoteException {
         String usuario = vista.getUsuario();
         System.out.println("Registrarse como usuario: " + usuario);
 
         try {
 
-            if (modelo.existeUsuario(usuario)) {
+            if (!modelo.existeUsuario(usuario)) {
                 int result = JOptionPane.showConfirmDialog(null, vista.getUserPanel(), "Dar de alta un usuario",
                         JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
@@ -50,6 +47,7 @@ public class SubastaControlador implements Controller {
                     System.out.println(printy);
 
                     if (modelo.registraUsuario(usuario, nuevoCliente)) {
+                        modelo.subscribe(this);
                         JOptionPane.showMessageDialog(null, "Cliente dado de alta con éxito!", "Dar de alta cliente",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -59,9 +57,13 @@ public class SubastaControlador implements Controller {
 
                 }
             }
+            else {
+                modelo.subscribe(this);
+            }
 
         } catch (RemoteException ex) {
             System.out.println("Fallo en el servidor");
+            ex.printStackTrace();
         }
     }
 
@@ -124,13 +126,23 @@ public class SubastaControlador implements Controller {
     public void changeDescription(Producto item) throws RemoteException {
         if (item != null) {
             System.out.println(item);
-            String context = (String) listaDescripcion.get(item.producto);
+            String context = listaDescripcion.get(item.producto);
             vista.desplegarDescripcion(context);
         }
     }
 
     public void updateView() throws RemoteException {
         this.updateProductList();
+    }
+
+    public void disconnect() {
+        try{
+            modelo.unsubscribe(this);
+        }
+        catch (RemoteException ex) {
+            System.out.println("Error al desconectarse del servidor");
+            ex.printStackTrace();
+        }
     }
 
 }

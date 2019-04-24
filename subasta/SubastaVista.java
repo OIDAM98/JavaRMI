@@ -1,6 +1,8 @@
 package subasta;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 
 import javax.swing.DefaultComboBoxModel;
@@ -51,7 +53,13 @@ public class SubastaVista {
 
     public SubastaVista() {
 
-        controller = new SubastaControlador(this);
+        try{
+            controller = new SubastaControlador(this);
+        }
+        catch (RemoteException ex) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
 
         Container panel;
 
@@ -91,22 +99,21 @@ public class SubastaVista {
         JPanel south = new JPanel();
         south.setLayout(new BorderLayout());
         JPanel productoInfo = new JPanel();
-        productoInfo.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 5));
-        productoInfo.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        productoInfo.setLayout(new GridLayout(1, 2));
+        //productoInfo.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
+        //productoInfo.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         JPanel ofrecerProd = new JPanel();
         ofrecerProd.setLayout(new GridLayout(1, 2));
 
-        obtenerLista = new JButton("Obtener lista");
-        productoInfo.add(new JLabel("Descripcion: "));
+        JLabel desc = new JLabel("Descripcion: ");
+        productoInfo.add(desc);
         descripcionProd = new JTextArea();
         JScrollPane scroll = new JScrollPane(descripcionProd);
         descripcionProd.setEditable(false);
         descripcionProd.setLineWrap(true);
         descripcionProd.setWrapStyleWord(true);
-        // scroll.setPreferredSize(new Dimension(usuario.getWidth(),
-        // usuario.getHeight()));
+        scroll.setPreferredSize(new Dimension(principal.getWidth(), 30));
 
-        productoInfo.add(obtenerLista);
         productoInfo.add(scroll);
         south.add(productoInfo, BorderLayout.NORTH);
 
@@ -127,7 +134,13 @@ public class SubastaVista {
         principal.setSize(500, 500);
         principal.setMinimumSize(new Dimension(600, 500));
         principal.setVisible(true);
-        principal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        principal.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        principal.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exitApp();
+            }
+        });
 
     }
 
@@ -195,27 +208,13 @@ public class SubastaVista {
             }
         });
 
-        salir.addActionListener(e -> {
-            try {
-                controller.disconnectUser();
-            } catch (RemoteException ex) {
-                System.out.println("Error al desconectar usuario");
-            }
-        });
+        salir.addActionListener(e -> exitApp());
 
         ponerALaVenta.addActionListener(e -> {
             try {
                 controller.putOnSale();
             } catch (RemoteException ex) {
                 System.out.println("Error al poner en venta un producto");
-            }
-        });
-
-        obtenerLista.addActionListener(e -> {
-            try {
-                controller.updateProductList();
-            } catch (RemoteException ex) {
-                System.out.println("Error al actualizar lista");
             }
         });
 
@@ -240,6 +239,14 @@ public class SubastaVista {
                 System.out.println("Error al cambiar la descripcion");
             }
         });
+    }
+
+    private void exitApp() {
+
+        controller.disconnect();
+
+        System.exit(1);
+
     }
 
     public JPanel getUserPanel() {
@@ -403,6 +410,8 @@ public class SubastaVista {
     public void desplegarDescripcion(String context) {
 
         descripcionProd.setText(context);
+        descripcionProd.revalidate();
+        descripcionProd.repaint();
 
     }
 

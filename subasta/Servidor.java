@@ -12,5 +12,8 @@ public interface Servidor extends Remote {
     boolean existeProducto(String producto) throws RemoteException;
     boolean agregaOferta(String comprador, String producto, float monto) throws RemoteException;
     Vector obtieneCatalogo() throws RemoteException;
+    void updateClients() throws RemoteException;
+    void subscribe(Controller c) throws RemoteException;
+    void unsubscribe(Controller c) throws RemoteException;
 
 }
