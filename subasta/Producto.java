@@ -56,6 +56,6 @@ public class Producto implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s %.2f %s", producto, precioActual, fechaCierre.format(FORMATTER) );
+        return String.format("%-20s Precio: %-20.2f Fecha limite: %s", producto, precioActual, fechaCierre.format(FORMATTER) );
     }
 }

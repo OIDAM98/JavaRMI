@@ -1,11 +1,6 @@
 package subasta;
 
-import java.awt.BorderLayout;
-import java.awt.ComponentOrientation;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.rmi.RemoteException;
 
 import javax.swing.DefaultComboBoxModel;
@@ -44,7 +39,6 @@ public class SubastaVista {
     JPanel productPanel;
 
     DefaultComboBoxModel productos;
-    JLabel precioActual;
     JTextArea descripcionProd;
     JList lista;
     JButton conectar;
@@ -52,6 +46,8 @@ public class SubastaVista {
     JButton ponerALaVenta;
     JButton obtenerLista;
     JButton ofrecer;
+
+    private static final Font FONT = new Font("Arial", Font.BOLD,14);
 
     public SubastaVista() {
 
@@ -87,6 +83,7 @@ public class SubastaVista {
         lista = new JList(productos); // data has type Object[]
         lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lista.setLayoutOrientation(JList.VERTICAL);
+        lista.setFont(FONT);
         JScrollPane listaScroller = new JScrollPane(lista);
         listaScroller.setPreferredSize(new Dimension(250, 80));
         panel.add(listaScroller, BorderLayout.CENTER);
@@ -128,7 +125,7 @@ public class SubastaVista {
         initializeListeners();
 
         principal.setSize(500, 500);
-        principal.setMinimumSize(new Dimension(500, 500));
+        principal.setMinimumSize(new Dimension(600, 500));
         principal.setVisible(true);
         principal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
