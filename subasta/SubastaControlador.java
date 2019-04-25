@@ -5,9 +5,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -73,7 +72,7 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
         int result = JOptionPane.showConfirmDialog(null, vista.getProductPanel(), "Datos para ofrecer producto",
                 JOptionPane.OK_CANCEL_OPTION);
         String producto = vista.getProducto();
-        if (modelo.existeProducto(producto)) {
+        if (!modelo.existeProducto(producto)) {
 
             System.out.println("Haciendo oferta del producto: " + producto);
 
@@ -89,7 +88,7 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
                 LocalDateTime fecha = LocalDateTime.of(año, mes, dia, hora, minutos);
                 Producto ofrecer = new Producto(usuario, producto, descripcion, monto, fecha);
 
-                if (modelo.agregaProductoALaVenta(producto, ofrecer)) {
+                if (modelo.agregaProductoALaVenta(usuario, producto, ofrecer)) {
                     JOptionPane.showMessageDialog(null, "Producto ofrecido con éxito!", "Ofrecer producto",
                             JOptionPane.INFORMATION_MESSAGE);
                 } else {
@@ -103,17 +102,15 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
 
     public void updateProductList() throws RemoteException {
 
-        Vector<Producto> lista = modelo.obtieneCatalogo();
-        Enumeration it;
-        Producto info;
+        List<Producto> lista = modelo.obtieneCatalogo();
         listaDescripcion = new Hashtable();
         vista.reinicializaListaProductos();
-        it = lista.elements();
-        while (it.hasMoreElements()) {
-            info = (Producto) it.nextElement();
-            listaDescripcion.put(info.producto, info.descripcion);
-            vista.agregaProducto(info);
-        }
+
+        lista.forEach(prod -> {
+            listaDescripcion.put(prod.producto, prod.descripcion);
+            vista.agregaProducto(prod);
+        });
+
     }
 
     public void offerOnProduct() throws RemoteException {

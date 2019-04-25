@@ -2,7 +2,7 @@ Todo list for RMI
 ===
 
 ## Model Classes
-* subasta.Oferta
+* subasta.Bid
 * subasta.Cliente
 * subasta.Producto
 - [ ] Add comments to each one

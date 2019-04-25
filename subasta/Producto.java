@@ -20,6 +20,7 @@ public class Producto implements Serializable {
     float precioInicial;
     float precioActual;
     LocalDateTime fechaCierre;
+    private boolean isActive;
     private static final String DATE_FORMATTER = "yyyy-MM-dd HH:mm:ss";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMATTER);
 
@@ -32,13 +33,15 @@ public class Producto implements Serializable {
         precioInicial = pi;
         precioActual = pi;
         fechaCierre = fc;
+        isActive = true;
 
     }
 
-    public boolean actualizaPrecio( float monto ) {
+    public boolean actualizaPrecio( float monto, String user ) {
 
         if( monto > precioActual ) {
             precioActual = monto;
+            vendedor = user;
             return true;
         } else
             return false;
@@ -54,8 +57,21 @@ public class Producto implements Serializable {
         return precioActual;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean status) {
+        this.isActive = status;
+    }
+
     @Override
     public String toString() {
-        return String.format("%-20s Precio: %-20.2f Fecha limite: %s", producto, precioActual, fechaCierre.format(FORMATTER) );
+        return String.format("%-10s Precio: %-10.2f Por: %-10s Fecha limite: %s",
+                producto,
+                precioActual,
+                vendedor,
+                fechaCierre.format(FORMATTER)
+        );
     }
 }

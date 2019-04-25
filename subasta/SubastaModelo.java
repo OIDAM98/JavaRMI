@@ -4,23 +4,21 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SubastaModelo implements Servidor {
 
     Hashtable<String, Cliente> usuarios;
     Hashtable<String, Producto> productos;
-    Hashtable<String, Oferta> ofertas;
+    List<Bid> bidHistory;
     List<Controller> clients;
 
     public SubastaModelo() {
 
         usuarios = new Hashtable();
         productos = new Hashtable();
-        ofertas = new Hashtable();
+        bidHistory = new ArrayList<>();
         clients = new ArrayList<>();
 
     }
@@ -72,11 +70,12 @@ public class SubastaModelo implements Servidor {
         return usuarios.containsKey(nombre);
     }
 
-    public boolean agregaProductoALaVenta( String producto, Producto vender) {
+    public boolean agregaProductoALaVenta( String usuario, String producto, Producto vender) {
         if (!productos.containsKey(producto)) {
 
             System.out.println("Agregando un nuevo producto: " + producto);
             productos.put(producto, vender);
+            bidHistory.add(new Bid(usuario, producto, vender.precioInicial));
             this.updateClients();
             return true;
 
@@ -85,7 +84,7 @@ public class SubastaModelo implements Servidor {
     }
 
     public boolean existeProducto(String producto) {
-        return !productos.containsKey(producto);
+        return productos.containsKey(producto);
     }
 
     public boolean agregaOferta(String comprador, String producto, float monto) {
@@ -95,9 +94,9 @@ public class SubastaModelo implements Servidor {
             Producto infoProd = productos.get(producto);
             Cliente user = usuarios.get(comprador);
 
-            if (infoProd.actualizaPrecio(monto)) {
+            if (infoProd.actualizaPrecio(monto, user.nombre)) {
 
-                ofertas.put(producto + comprador, new Oferta(user, infoProd));
+                bidHistory.add(new Bid(user.nombre, infoProd.producto, infoProd.precioActual));
                 this.updateClients();
                 return true;
 
@@ -110,10 +109,31 @@ public class SubastaModelo implements Servidor {
             return false;
     }
 
-    public Vector obtieneCatalogo() {
+    public List obtieneCatalogo() {
 
-        return new Vector(productos.values());
+        return productos
+                .values()
+                .stream()
+                .filter(p -> p.isActive())
+                .collect(Collectors.toList());
 
+    }
+
+    public List getBidHistory() {
+        List<Bid> sorted = new ArrayList<>(bidHistory);
+        sorted.sort(
+                Comparator.comparing(Bid::getProduct)
+                        .thenComparing(Bid::getPrice)
+        );
+        return sorted;
+    }
+
+    public void exitApp() {
+        System.out.println("Ofertas durante el periodo");
+        this.getBidHistory().forEach(System.out::println);
+        if(!clients.isEmpty()) {
+            clients.forEach(this::unsubscribe);
+        }
     }
 
     public static void main(String... args) {
@@ -126,6 +146,9 @@ public class SubastaModelo implements Servidor {
             registry.bind("subasta", stub);
 
             System.out.println("Server ready");
+
+            Runtime.getRuntime().addShutdownHook(new Thread( () -> obj.exitApp() ));
+
         }
         catch (Exception e) {
             System.err.println("Server exception: " + e.toString());

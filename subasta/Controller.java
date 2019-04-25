@@ -17,4 +17,6 @@ public interface Controller extends Remote {
 
   void updateView() throws RemoteException;
 
+  void disconnect() throws RemoteException;
+
 }
