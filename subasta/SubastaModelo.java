@@ -1,5 +1,6 @@
 package subasta;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
@@ -163,18 +164,28 @@ public class SubastaModelo implements Servidor {
     }
 
     public void exitApp() {
+        saveBids();
+        unsubscribeRemainingClients();
+    }
+
+    private void saveBids() {
         System.out.println("Ofertas durante el periodo");
         this.getBidHistory().forEach(System.out::println);
         try{
-            PrintWriter outFile = new PrintWriter("historial.txt");
+            FileWriter fw = new FileWriter("historial/" + LocalDateTime.now() + ".csv");
+            PrintWriter outFile = new PrintWriter(fw);
             this.getBidHistory().forEach(outFile::println);
             outFile.close();
         }
         catch (IOException ex) {
             System.out.println("Problema al escribir al archivo");
         }
+    }
+
+    private void unsubscribeRemainingClients() {
         if(!clients.isEmpty()) {
-            clients.forEach(this::unsubscribe);
+            List<Controller> remains = new ArrayList<>(clients);
+            remains.forEach(this::unsubscribe);
         }
     }
 
