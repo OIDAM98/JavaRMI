@@ -26,38 +26,57 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
         }
     }
 
-    public void connectUser() throws RemoteException {
-        String usuario = vista.getUsuario();
-        System.out.println("Registrarse como usuario: " + usuario);
+    public void connectUser() {
 
         try {
 
+            String usuario = vista.getUsuario();
+            System.out.println("Registrarse como usuario: " + usuario);
+
             if (!modelo.existeUsuario(usuario)) {
-                int result = JOptionPane.showConfirmDialog(null, vista.getUserPanel(), "Dar de alta un usuario",
+                int result = JOptionPane.showConfirmDialog(null,
+                        vista.getUserPanel(),
+                        "Dar de alta un usuario",
                         JOptionPane.OK_CANCEL_OPTION);
+
                 if (result == JOptionPane.OK_OPTION) {
                     try {
                         String direccion = vista.getDireccion();
                         String email = vista.getEmail();
                         String telefono = vista.getTelefono();
                         String nickname = vista.getNickname();
-                        vista.resetUserPanel();
                         Cliente nuevoCliente = new Cliente(usuario, direccion, email, telefono, nickname);
                         String printy = String.format("%s %s %s %s %s", usuario, direccion, email, telefono, nickname);
                         System.out.println(printy);
 
                         if (modelo.registraUsuario(usuario, nuevoCliente)) {
                             modelo.subscribe(this);
-                            JOptionPane.showMessageDialog(null, "Cliente dado de alta con éxito!", "Dar de alta cliente",
+                            JOptionPane.showMessageDialog(null,
+                                    "Cliente dado de alta con éxito!",
+                                    "Dar de alta cliente",
                                     JOptionPane.INFORMATION_MESSAGE);
                             vista.activateButtons();
                         } else {
-                            JOptionPane.showMessageDialog(null, "Hubo un error al dar de alta el cliente.",
-                                    "Dar de alta cliente", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null,
+                                    "Hubo un error al dar de alta el cliente.",
+                                    "Dar de alta cliente",
+                                    JOptionPane.ERROR_MESSAGE);
                         }
                     }
+                    catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null,
+                                "Campo debe de contener solamente numeros",
+                                "Dar de alta cliente",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                     catch (IllegalArgumentException ex) {
-                        System.out.println(ex.getMessage());
+                        JOptionPane.showMessageDialog(null,
+                                ex.getMessage(),
+                                "Dar de alta cliente",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    finally {
+                        vista.resetUserPanel();
                     }
 
                 }
@@ -66,9 +85,18 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
                 modelo.subscribe(this);
             }
 
-        } catch (RemoteException ex) {
-            System.out.println("Fallo en el servidor");
-            ex.printStackTrace();
+        }
+        catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(null,
+                    ex.getMessage(),
+                    "Dar de alta cliente",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        catch (RemoteException ex) {
+            JOptionPane.showMessageDialog(null,
+                    "Fallo en el servidor",
+                    "Dar de alta cliente",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -78,32 +106,74 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
         int result = JOptionPane.showConfirmDialog(null, vista.getProductPanel(), "Datos para ofrecer producto",
                 JOptionPane.OK_CANCEL_OPTION);
         String producto = vista.getProducto();
-        if (!modelo.existeProducto(producto)) {
 
-            System.out.println("Haciendo oferta del producto: " + producto);
+        if(producto.length() != 0) {
 
-            if (result == JOptionPane.OK_OPTION) {
-                float monto = vista.getPrecioInicial();
-                String descripcion = vista.getDescripcionProducto();
-                int año = vista.getAñoOferta();
-                int mes = vista.getMesOferta();
-                int dia = vista.getDiaOferta();
-                int hora = vista.getHoraOferta();
-                int minutos = vista.getMinutoOferta();
-                vista.resetProductPanel();
-                LocalDateTime fecha = LocalDateTime.of(año, mes, dia, hora, minutos);
-                Producto ofrecer = new Producto(usuario, producto, descripcion, monto, fecha);
+            if (!modelo.existeProducto(producto)) {
 
-                if (modelo.agregaProductoALaVenta(usuario, producto, ofrecer)) {
-                    JOptionPane.showMessageDialog(null, "Producto ofrecido con éxito!", "Ofrecer producto",
-                            JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Hubo un error al ofrecer el producto.", "Ofrecer producto",
-                            JOptionPane.ERROR_MESSAGE);
+                System.out.println("Haciendo oferta del producto: " + producto);
+
+                if (result == JOptionPane.OK_OPTION) {
+                    try{
+                        float monto = vista.getPrecioInicial();
+                        String descripcion = vista.getDescripcionProducto();
+                        int año = vista.getAñoOferta();
+                        int mes = vista.getMesOferta();
+                        int dia = vista.getDiaOferta();
+                        int hora = vista.getHoraOferta();
+                        int minutos = vista.getMinutoOferta();
+
+                        LocalDateTime now = LocalDateTime.now();
+                        if(minutos <= now.getMinute() + 1)
+                            throw new IllegalArgumentException("La subasta debe de tener al menos dos minutos de tiempo activo");
+
+                        LocalDateTime fecha = LocalDateTime.of(año, mes, dia, hora, minutos);
+                        Producto ofrecer = new Producto(usuario, producto, descripcion, monto, fecha);
+
+                        if (modelo.agregaProductoALaVenta(usuario, producto, ofrecer)) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Producto ofrecido con éxito!",
+                                    "Ofrecer producto",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null,
+                                    "Hubo un error al ofrecer el producto.",
+                                    "Ofrecer producto",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                    catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null,
+                                "Campo debe de contener solamente numeros",
+                                "Subastar producto",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    catch (IllegalArgumentException ex) {
+                        JOptionPane.showMessageDialog(null,
+                                ex.getMessage(),
+                                "Subastar producto",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    finally {
+                        vista.resetProductPanel();
+                    }
                 }
-
             }
+            else {
+                JOptionPane.showMessageDialog(null,
+                        "Producto ya se encuentra en venta.",
+                        "Subastar producto",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
         }
+        else {
+            JOptionPane.showMessageDialog(null,
+                    "Ingrese producto a subastar.",
+                    "Subastar producto",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
     }
 
     public void updateProductList() throws RemoteException {
@@ -120,13 +190,22 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
     }
 
     public void offerOnProduct() throws RemoteException {
-        Producto offer = vista.getProductoSeleccionado();
-        float monto = vista.getMontoOfrecido();
-        String usuario = vista.getUsuario();
-        modelo.agregaOferta(usuario, offer.producto, monto);
+        try {
+            Producto offer = vista.getProductoSeleccionado();
+            float monto = vista.getMontoOfrecido();
+            String usuario = vista.getUsuario();
+
+            modelo.agregaOferta(usuario, offer.producto, monto);
+        }
+        catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(null,
+                    "Debe seleccionar un producto para ofrecer.",
+                    "Ofrecer en producto",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    public void changeDescription(Producto item) throws RemoteException {
+    public void changeDescription(Producto item) {
         if (item != null) {
             System.out.println(item);
             String context = listaDescripcion.get(item.producto);

@@ -1,25 +1,10 @@
 package subasta;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 
 public class SubastaVista {
 
@@ -264,49 +249,56 @@ public class SubastaVista {
     }
 
     public String getUsuario() {
-        return usuario.getText();
+        String txt = usuario.getText();
+        boolean vacio = false;
+        if(txt.length() == 0) {
+            vacio = true;
+            throw new IllegalArgumentException("Usuario no puede estar vacío, intente otra vez.");
+        }
+
+        return vacio ? txt : "";
     }
 
     public String getDireccion() {
-        return direccion.getText();
+        String txt = direccion.getText();
+        boolean vacio = false;
+        if(txt.length() == 0) {
+            vacio = true;
+            throw new IllegalArgumentException("Direccion no puede estar vacía, intente otra vez.");
+        }
+
+        return vacio ? txt : "";
     }
 
     public String getEmail() {
+        String txt = email.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Correo no puede estar vacío, intente otra vez.");
+
         String emailTest = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+        boolean notPass = !txt.matches(emailTest);
+        if (notPass) throw new IllegalArgumentException("Correo incorrecto, intente otra vez.");
 
-        if (!email.getText().matches(emailTest)) {
-            JOptionPane.showMessageDialog(principal, "Error en email! Insertar email correcto");
-        }
 
-        return email.getText();
+        return notPass ? txt : "";
     }
 
-    public String getTelefono() {
+    public String getTelefono() throws IllegalArgumentException{
+        String txt = telefono.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Telefono no puede estar vacío, intente otra vez.");
+        if(txt.length() > 10) throw new IllegalArgumentException("Numero de telefono no puede ser mayor a 10 digitos");
 
         String resultado = "";
-
-        try {
-
-            if (telefono.getText() == resultado) {
-                throw new Exception();
-            } else {
-                int phone = Integer.parseInt(telefono.getText());
-
-                resultado = String.valueOf(phone);
-            }
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(principal, "Error en tel! Insertar numero correcto");
-            System.out.println("Hay problemas con el año de la oferta");
-
-        }
+        long phone = Long.parseLong(txt);
+        resultado = String.valueOf(phone);
 
         return resultado;
     }
 
-    public String getNickname() {
-        return nickname.getText();
+    public String getNickname() throws IllegalArgumentException {
+        String txt = nickname.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Nickname no puede estar vacía, intente otra vez.");
+
+        return txt;
     }
 
     public void resetUserPanel() {
@@ -324,115 +316,78 @@ public class SubastaVista {
         return producto.getText();
     }
 
-    public String getDescripcionProducto() {
-        return descripcion.getText();
+    public String getDescripcionProducto() throws IllegalArgumentException {
+        String txt = descripcionProd.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("La descripción no puede estar vacía, intente otra vez.");
+        if(txt.length() > 30) throw new IllegalArgumentException("La descripción del producto no puede ser mayor a 30 digitos");
+
+        return txt;
     }
 
     public float getPrecioInicial() throws IllegalArgumentException {
         String txt = precioInicial.getText();
-        if (txt.length() == 0)
-            throw new IllegalArgumentException("Campo no puede estar vacío, intente otra vez.");
-        float resultado = 0.0f;
-        resultado = Float.parseFloat(precioInicial.getText());
-        /*
-         * if (resultado < 0) { throw new Exception(); }
-         */
+        if(txt.length() == 0) throw new IllegalArgumentException("Precio no puede estar vacío, intente otra vez.");
+      
+        float resultado = 0;
+        resultado = Float.parseFloat(txt);
+        if (resultado < 0) throw new IllegalArgumentException("Precio no puede ser menor a 0, intente otra vez.");
 
         return resultado;
     }
 
-    public int getAñoOferta() {
+    public int getAñoOferta() throws IllegalArgumentException {
+        String txt = año.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Año no puede estar vacío, intente otra vez.");
+
         int resultado = 0;
-
-        try {
-
-            resultado = Integer.parseInt(año.getText());
-            if (resultado < 2019) {
-                throw new Exception();
-            }
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(principal, "Error en a;o! Insertar numero correcto");
-            System.out.println("Hay problemas con el año de la oferta");
-
+        resultado = Integer.parseInt(txt);
+        if (resultado < 2019) {
+            throw new IllegalArgumentException("Año no puede ser anterior al actual.");
         }
 
         return resultado;
     }
 
-    public int getMesOferta() {
+    public int getMesOferta() throws IllegalArgumentException {
+        String txt = mes.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Mes no puede estar vacío, intente otra vez.");
+
         int resultado = 0;
-
-        try {
-
-            resultado = Integer.parseInt(mes.getText());
-            if (resultado < 0 || resultado > 12) {
-                throw new Exception();
-            }
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(principal, "Error en Mes! Insertar numero correcto");
-            System.out.println("Hay problemas con el mes de la oferta");
-        }
+        resultado = Integer.parseInt(txt);
+        if (resultado < 0 || resultado > 12) throw new IllegalArgumentException("Mes debe estar entre 0 y 12");
 
         return resultado;
     }
 
-    public int getDiaOferta() {
+    public int getDiaOferta() throws IllegalArgumentException {
+        String txt = dia.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Dia no puede estar vacío, intente otra vez.");
+
         int resultado = 0;
-
-        try {
-
-            resultado = Integer.parseInt(dia.getText());
-            if (resultado < 0 || resultado > 31) {
-                throw new Exception();
-            }
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(principal, "Error en dia! Insertar numero correcto");
-            System.out.println("Hay problemas con el dia de la oferta");
-        }
+        resultado = Integer.parseInt(txt);
+        if (resultado < 0 || resultado > 31) throw new IllegalArgumentException("Dia debe de estar entre 0 y 31.");
 
         return resultado;
     }
 
-    public int getHoraOferta() {
+    public int getHoraOferta() throws IllegalArgumentException {
+        String txt = hora.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Hora no puede estar vacia, intente otra vez.");
+
         int resultado = 0;
-
-        try {
-
-            resultado = Integer.parseInt(hora.getText());
-            if (resultado < 0 || resultado > 12) {
-                throw new Exception();
-            }
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(principal, "Error en hora! Insertar numero correcto");
-            System.out.println("Hay problemas con el precio inicial");
-        }
+        resultado = Integer.parseInt(txt);
+        if (resultado < 0 || resultado > 12) throw new IllegalArgumentException("Hora debe estar entre 0 y 12.");
 
         return resultado;
     }
 
-    public int getMinutoOferta() {
+    public int getMinutoOferta() throws IllegalArgumentException {
+        String txt = minuto.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Minutos no pueden estar vacíos, intente otra vez.");
+
         int resultado = 0;
-
-        try {
-
-            resultado = Integer.parseInt(minuto.getText());
-            if (resultado < 0 || resultado > 60) {
-                throw new Exception();
-            }
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(principal, "Error en minuto! Insertar numero correcto");
-            System.out.println("Hay problemas con el precio inicial");
-        }
+        resultado = Integer.parseInt(txt);
+        if (resultado < 0 || resultado > 60) throw new IllegalArgumentException("Minutos deben de estar entre 0 y 59.");
 
         return resultado;
     }
@@ -467,23 +422,18 @@ public class SubastaVista {
 
     }
 
-    public float getMontoOfrecido() {
+    public float getMontoOfrecido() throws IllegalArgumentException {
+        String txt = minuto.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Campo no puede estar vacío, intente otra vez.");
 
         float resultado = 0.0f;
-
-        try {
-
-            resultado = Float.parseFloat(monto.getText());
-
-        } catch (Exception e) {
-
-            System.out.println("Hay problemas con el monto ofrecido");
-        }
+        resultado = Float.parseFloat(monto.getText());
+        if (resultado < 0) throw new IllegalArgumentException("Precio no puede ser menor a 0, intente otra vez.");
 
         return resultado;
     }
 
-    public Producto getProductoSeleccionado() {
+    public Producto getProductoSeleccionado() throws NullPointerException {
 
         return (Producto) lista.getSelectedValue();
     }
