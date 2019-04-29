@@ -15,19 +15,20 @@ import java.time.format.DateTimeFormatter;
 public class Producto implements Serializable {
 
     String vendedor;
+    String vendedorActual;
     String producto;
     String descripcion;
     float precioInicial;
     float precioActual;
     LocalDateTime fechaCierre;
     private boolean isActive;
-    private static final String DATE_FORMATTER = "yyyy-MM-dd HH:mm:ss";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMATTER);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
     public Producto(String v, String p, String d, float pi, LocalDateTime fc ) {
 
         vendedor = v;
+        vendedorActual = v;
         producto = p;
         descripcion = d;
         precioInicial = pi;
@@ -41,7 +42,7 @@ public class Producto implements Serializable {
 
         if( monto > precioActual ) {
             precioActual = monto;
-            vendedor = user;
+            vendedorActual = user;
             return true;
         } else
             return false;

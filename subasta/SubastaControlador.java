@@ -36,22 +36,27 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
                 int result = JOptionPane.showConfirmDialog(null, vista.getUserPanel(), "Dar de alta un usuario",
                         JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
-                    String direccion = vista.getDireccion();
-                    String email = vista.getEmail();
-                    String telefono = vista.getTelefono();
-                    String nickname = vista.getNickname();
-                    vista.resetUserPanel();
-                    Cliente nuevoCliente = new Cliente(usuario, direccion, email, telefono, nickname);
-                    String printy = String.format("%s %s %s %s %s", usuario, direccion, email, telefono, nickname);
-                    System.out.println(printy);
+                    try {
+                        String direccion = vista.getDireccion();
+                        String email = vista.getEmail();
+                        String telefono = vista.getTelefono();
+                        String nickname = vista.getNickname();
+                        vista.resetUserPanel();
+                        Cliente nuevoCliente = new Cliente(usuario, direccion, email, telefono, nickname);
+                        String printy = String.format("%s %s %s %s %s", usuario, direccion, email, telefono, nickname);
+                        System.out.println(printy);
 
-                    if (modelo.registraUsuario(usuario, nuevoCliente)) {
-                        modelo.subscribe(this);
-                        JOptionPane.showMessageDialog(null, "Cliente dado de alta con éxito!", "Dar de alta cliente",
-                                JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Hubo un error al dar de alta el cliente.",
-                                "Dar de alta cliente", JOptionPane.ERROR_MESSAGE);
+                        if (modelo.registraUsuario(usuario, nuevoCliente)) {
+                            modelo.subscribe(this);
+                            JOptionPane.showMessageDialog(null, "Cliente dado de alta con éxito!", "Dar de alta cliente",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Hubo un error al dar de alta el cliente.",
+                                    "Dar de alta cliente", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                    catch (IllegalArgumentException ex) {
+                        System.out.println(ex.getMessage());
                     }
 
                 }

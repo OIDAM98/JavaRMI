@@ -303,21 +303,14 @@ public class SubastaVista {
         return descripcion.getText();
     }
 
-    public float getPrecioInicial() {
-
+    public float getPrecioInicial() throws IllegalArgumentException{
+        String txt = precioInicial.getText();
+        if(txt.length() == 0) throw new IllegalArgumentException("Campo no puede estar vacío, intente otra vez.");
         float resultado = 0.0f;
-
-        try {
-
-            resultado = Float.parseFloat(precioInicial.getText());
-            if (resultado < 0) {
-                throw new Exception();
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(principal, "Error en precio inical! Insertar numero correcto");
-            System.out.println("Hay problemas con el precio inicial");
-        }
+        resultado = Float.parseFloat(precioInicial.getText());
+        /*if (resultado < 0) {
+            throw new Exception();
+        }*/
 
         return resultado;
     }
