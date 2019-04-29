@@ -50,6 +50,7 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
                             modelo.subscribe(this);
                             JOptionPane.showMessageDialog(null, "Cliente dado de alta con éxito!", "Dar de alta cliente",
                                     JOptionPane.INFORMATION_MESSAGE);
+                            vista.activateButtons();
                         } else {
                             JOptionPane.showMessageDialog(null, "Hubo un error al dar de alta el cliente.",
                                     "Dar de alta cliente", JOptionPane.ERROR_MESSAGE);
