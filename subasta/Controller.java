@@ -19,4 +19,8 @@ public interface Controller extends Remote {
 
   void disconnect() throws RemoteException;
 
+  String getUser() throws RemoteException;
+
+  void notifyEndBid(Cliente client, Producto prod) throws RemoteException;
+
 }

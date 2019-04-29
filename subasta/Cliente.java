@@ -27,4 +27,9 @@ public class Cliente implements Serializable {
         this.nickname = nickname;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s%n%s%n%s%n%s%n%s", nombre, direccion, email, telefono, nickname);
+    }
+
 }

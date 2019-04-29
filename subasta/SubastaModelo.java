@@ -100,6 +100,7 @@ public class SubastaModelo implements Servidor {
 
                     System.out.println("task monsta");
                     vender.setActive(false);
+                    notifyBid(vender.vendedor, vender);
                     System.out.println("actualizando clientes");
                     updateClients();
                     System.out.println("se actualizaron c:");
@@ -136,21 +137,21 @@ public class SubastaModelo implements Servidor {
                 return true;
 
             } else
-
                 return false;
 
         } else
-
             return false;
+
     }
 
     public List<Producto> obtieneCatalogo() {
 
-        return productos
+        List<Producto> toRet = productos
                 .values()
                 .stream()
                 .filter(p -> p.isActive())
                 .collect(Collectors.toList());
+        return toRet;
 
     }
 
@@ -168,8 +169,22 @@ public class SubastaModelo implements Servidor {
         unsubscribeRemainingClients();
     }
 
+    private void notifyBid(String notify, Producto prod) {
+        for(Controller c : clients) {
+            try {
+                if(c.getUser() == notify) {
+                    Cliente client = usuarios.get(prod.vendedorActual);
+                    c.notifyEndBid(client, prod);
+                }
+            }
+            catch (RemoteException ex) {
+                System.out.println("Error al buscar cliente");
+            }
+        }
+    }
+
     private void saveBids() {
-        System.out.println("Ofertas durante el periodo");
+        System.out.println("\nOfertas durante el periodo");
         this.getBidHistory().forEach(System.out::println);
         try{
             FileWriter fw = new FileWriter("historial/" + LocalDateTime.now() + ".csv");

@@ -8,7 +8,7 @@ import java.rmi.RemoteException;
 
 public class SubastaVista {
 
-    SubastaControlador controller;
+    AuctionController controller;
 
     JFrame principal;
 
@@ -44,7 +44,7 @@ public class SubastaVista {
     public SubastaVista() {
 
         try {
-            controller = new SubastaControlador(this);
+            controller = new AuctionController(this);
         } catch (RemoteException ex) {
             ex.printStackTrace();
             System.exit(1);
@@ -189,13 +189,7 @@ public class SubastaVista {
 
     private void initializeListeners() {
 
-        conectar.addActionListener(e -> {
-            try {
-                controller.connectUser();
-            } catch (RemoteException ex) {
-                System.out.println("Error al conectar usuario");
-            }
-        });
+        conectar.addActionListener(e -> controller.connectUser() );
 
         salir.addActionListener(e -> exitApp());
 
@@ -216,17 +210,14 @@ public class SubastaVista {
         });
 
         lista.addListSelectionListener(e -> {
-            try {
 
-                if (e.getValueIsAdjusting() == false) {
-                    JList lista = (JList) e.getSource();
-                    Producto item = (Producto) lista.getSelectedValue();
-                    controller.changeDescription(item);
+            if (e.getValueIsAdjusting() == false) {
+                JList lista = (JList) e.getSource();
+                Producto item = (Producto) lista.getSelectedValue();
+                controller.changeDescription(item);
 
-                }
-            } catch (RemoteException ex) {
-                System.out.println("Error al cambiar la descripcion");
             }
+
         });
     }
 
@@ -433,7 +424,7 @@ public class SubastaVista {
         return resultado;
     }
 
-    public Producto getProductoSeleccionado() throws NullPointerException {
+    public Producto getProductoSeleccionado() {
 
         return (Producto) lista.getSelectedValue();
     }
