@@ -103,7 +103,7 @@ public class SubastaControlador extends UnicastRemoteObject implements Controlle
     public void updateProductList() throws RemoteException {
 
         List<Producto> lista = modelo.obtieneCatalogo();
-        listaDescripcion = new Hashtable();
+        listaDescripcion = new Hashtable<>();
         vista.reinicializaListaProductos();
 
         lista.forEach(prod -> {

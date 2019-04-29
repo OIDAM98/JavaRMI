@@ -4,6 +4,7 @@ target/
 out/
 .attach*
 *.png
+historial/*.csv
 
 # Compiled class file
 *.class

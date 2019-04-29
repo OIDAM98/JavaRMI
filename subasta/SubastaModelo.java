@@ -1,9 +1,15 @@
 package subasta;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,28 +22,27 @@ public class SubastaModelo implements Servidor {
 
     public SubastaModelo() {
 
-        usuarios = new Hashtable();
-        productos = new Hashtable();
+        usuarios = new Hashtable<>();
+        productos = new Hashtable<>();
         bidHistory = new ArrayList<>();
         clients = new ArrayList<>();
 
     }
 
     public void updateClients() {
-        if(!obtieneCatalogo().isEmpty()) {
-            Controller current = null;
-            try {
-                for(Controller c : clients) {
-                    c.updateView();
-                    System.out.println("se actualizo alguien");
-                    current = c;
-                }
-            }
-            catch (RemoteException ex) {
-                System.out.println("Hubo un error al actualizar cliente " + current);
-                this.unsubscribe(current);
+        Controller current = null;
+        try {
+            for(Controller c : clients) {
+                c.updateView();
+                System.out.println("se actualizo alguien");
+                current = c;
             }
         }
+        catch (RemoteException ex) {
+            System.out.println("Hubo un error al actualizar cliente " + current);
+            this.unsubscribe(current);
+        }
+
     }
 
     public void subscribe(Controller c) {
@@ -76,6 +81,36 @@ public class SubastaModelo implements Servidor {
             System.out.println("Agregando un nuevo producto: " + producto);
             productos.put(producto, vender);
             bidHistory.add(new Bid(usuario, producto, vender.precioInicial));
+
+            ZoneId znid = ZoneId.systemDefault();
+            LocalDateTime start = LocalDateTime.now();
+            LocalDateTime end = vender.fechaCierre;
+            Instant endTime = end.atZone(znid).toInstant();
+            long startTime = Instant.now().toEpochMilli();
+            long durationSecond = endTime.minusMillis(startTime).toEpochMilli();
+
+            System.out.println("start: " + start + " to milli " + startTime);
+            System.out.println("end: " + end + " to milli " + endTime.toEpochMilli());
+            System.out.println("duration " + durationSecond);
+
+            Timer timer = new Timer();
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+
+                    System.out.println("task monsta");
+                    vender.setActive(false);
+                    System.out.println("actualizando clientes");
+                    updateClients();
+                    System.out.println("se actualizaron c:");
+                    timer.cancel();
+                    timer.purge();
+
+                }
+            };
+
+            timer.schedule(task, durationSecond, 1000);
+
             this.updateClients();
             return true;
 
@@ -109,7 +144,7 @@ public class SubastaModelo implements Servidor {
             return false;
     }
 
-    public List obtieneCatalogo() {
+    public List<Producto> obtieneCatalogo() {
 
         return productos
                 .values()
@@ -119,7 +154,7 @@ public class SubastaModelo implements Servidor {
 
     }
 
-    public List getBidHistory() {
+    public List<Bid> getBidHistory() {
         List<Bid> sorted = new ArrayList<>(bidHistory);
         sorted.sort(
                 Comparator.comparing(Bid::getProduct)
@@ -129,10 +164,28 @@ public class SubastaModelo implements Servidor {
     }
 
     public void exitApp() {
+        saveBids();
+        unsubscribeRemainingClients();
+    }
+
+    private void saveBids() {
         System.out.println("Ofertas durante el periodo");
         this.getBidHistory().forEach(System.out::println);
+        try{
+            FileWriter fw = new FileWriter("historial/" + LocalDateTime.now() + ".csv");
+            PrintWriter outFile = new PrintWriter(fw);
+            this.getBidHistory().forEach(outFile::println);
+            outFile.close();
+        }
+        catch (IOException ex) {
+            System.out.println("Problema al escribir al archivo");
+        }
+    }
+
+    private void unsubscribeRemainingClients() {
         if(!clients.isEmpty()) {
-            clients.forEach(this::unsubscribe);
+            List<Controller> remains = new ArrayList<>(clients);
+            remains.forEach(this::unsubscribe);
         }
     }
 
@@ -147,7 +200,7 @@ public class SubastaModelo implements Servidor {
 
             System.out.println("Server ready");
 
-            Runtime.getRuntime().addShutdownHook(new Thread( () -> obj.exitApp() ));
+            Runtime.getRuntime().addShutdownHook(new Thread( obj::exitApp ));
 
         }
         catch (Exception e) {

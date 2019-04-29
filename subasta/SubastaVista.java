@@ -5,16 +5,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 
 public class SubastaVista {
 
@@ -40,7 +31,7 @@ public class SubastaVista {
     JTextField minuto;
     JPanel productPanel;
 
-    DefaultComboBoxModel productos;
+    DefaultListModel<Producto> productos;
     JTextArea descripcionProd;
     JList lista;
     JButton conectar;
@@ -87,7 +78,7 @@ public class SubastaVista {
         north.add(accionesUsuario, BorderLayout.SOUTH);
         panel.add(north, BorderLayout.NORTH);
 
-        productos = new DefaultComboBoxModel();
+        productos = new DefaultListModel<>();
         lista = new JList(productos); // data has type Object[]
         lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lista.setLayoutOrientation(JList.VERTICAL);
@@ -100,8 +91,6 @@ public class SubastaVista {
         south.setLayout(new BorderLayout());
         JPanel productoInfo = new JPanel();
         productoInfo.setLayout(new GridLayout(1, 2));
-        //productoInfo.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
-        //productoInfo.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         JPanel ofrecerProd = new JPanel();
         ofrecerProd.setLayout(new GridLayout(1, 2));
 
@@ -399,6 +388,8 @@ public class SubastaVista {
     public void reinicializaListaProductos() {
 
         productos.removeAllElements();
+        descripcionProd.setText("");
+
     }
 
     public void agregaProducto(Producto prod) {
@@ -410,8 +401,6 @@ public class SubastaVista {
     public void desplegarDescripcion(String context) {
 
         descripcionProd.setText(context);
-        descripcionProd.revalidate();
-        descripcionProd.repaint();
 
     }
 
