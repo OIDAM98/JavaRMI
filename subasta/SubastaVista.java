@@ -39,14 +39,13 @@ public class SubastaVista {
     JButton obtenerLista;
     JButton ofrecer;
 
-    private static final Font FONT = new Font("Arial", Font.BOLD,14);
+    private static final Font FONT = new Font("Arial", Font.BOLD, 14);
 
     public SubastaVista() {
 
-        try{
+        try {
             controller = new SubastaControlador(this);
-        }
-        catch (RemoteException ex) {
+        } catch (RemoteException ex) {
             ex.printStackTrace();
             System.exit(1);
         }
@@ -72,6 +71,7 @@ public class SubastaVista {
         accionesUsuario.add(conectar);
         ponerALaVenta = new JButton("Poner a la venta");
         accionesUsuario.add(ponerALaVenta);
+        ponerALaVenta.setEnabled(false);
 
         north.add(usuarioDatos, BorderLayout.NORTH);
         north.add(accionesUsuario, BorderLayout.SOUTH);
@@ -108,6 +108,7 @@ public class SubastaVista {
         monto = new JTextField();
         ofrecer = new JButton("Ofrecer");
         ofrecerProd.add(ofrecer);
+        ofrecer.setEnabled(false);
         ofrecerProd.add(monto);
         south.add(ofrecerProd, BorderLayout.CENTER);
 
@@ -237,6 +238,12 @@ public class SubastaVista {
 
     }
 
+    public void activateButtons() {
+        ofrecer.setEnabled(true);
+        ponerALaVenta.setEnabled(true);
+        conectar.setEnabled(false);
+    }
+
     public JPanel getUserPanel() {
         return userPanel;
     }
@@ -270,6 +277,7 @@ public class SubastaVista {
         String emailTest = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
         boolean notPass = !txt.matches(emailTest);
         if (notPass) throw new IllegalArgumentException("Correo incorrecto, intente otra vez.");
+
 
         return notPass ? txt : "";
     }
@@ -316,13 +324,13 @@ public class SubastaVista {
         return txt;
     }
 
-    public float getPrecioInicial() throws IllegalArgumentException{
+    public float getPrecioInicial() throws IllegalArgumentException {
         String txt = precioInicial.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Precio no puede estar vacío, intente otra vez.");
+      
         float resultado = 0;
         resultado = Float.parseFloat(txt);
         if (resultado < 0) throw new IllegalArgumentException("Precio no puede ser menor a 0, intente otra vez.");
-
 
         return resultado;
     }
