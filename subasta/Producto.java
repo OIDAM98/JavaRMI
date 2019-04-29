@@ -71,7 +71,7 @@ public class Producto implements Serializable {
         return String.format("%-10s Precio: %-10.2f Por: %-10s Fecha limite: %s",
                 producto,
                 precioActual,
-                vendedor,
+                vendedorActual,
                 fechaCierre.format(FORMATTER)
         );
     }
