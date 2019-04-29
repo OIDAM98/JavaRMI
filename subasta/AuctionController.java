@@ -121,6 +121,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
             else {
                 //Subscribe controller to server
                 modelo.subscribe(this);
+                vista.activateButtons();
                 //Notify that the user has returned to the session successfully
                 JOptionPane.showMessageDialog(null,
                         "Bienvenido de regreso " + usuario + "!",

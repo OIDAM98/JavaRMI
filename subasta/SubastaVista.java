@@ -247,7 +247,7 @@ public class SubastaVista {
             throw new IllegalArgumentException("Usuario no puede estar vacío, intente otra vez.");
         }
 
-        return vacio ? txt : "";
+        return !vacio ? txt : "";
     }
 
     public String getDireccion() {
@@ -258,7 +258,7 @@ public class SubastaVista {
             throw new IllegalArgumentException("Direccion no puede estar vacía, intente otra vez.");
         }
 
-        return vacio ? txt : "";
+        return !vacio ? txt : "";
     }
 
     public String getEmail() {
@@ -308,7 +308,7 @@ public class SubastaVista {
     }
 
     public String getDescripcionProducto() throws IllegalArgumentException {
-        String txt = descripcionProd.getText();
+        String txt = descripcion.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("La descripción no puede estar vacía, intente otra vez.");
         if(txt.length() > 30) throw new IllegalArgumentException("La descripción del producto no puede ser mayor a 30 digitos");
 
@@ -367,7 +367,7 @@ public class SubastaVista {
 
         int resultado = 0;
         resultado = Integer.parseInt(txt);
-        if (resultado < 0 || resultado > 12) throw new IllegalArgumentException("Hora debe estar entre 0 y 12.");
+        if (resultado < 0 || resultado > 23) throw new IllegalArgumentException("Hora debe estar entre 0 y 23.");
 
         return resultado;
     }
@@ -414,7 +414,7 @@ public class SubastaVista {
     }
 
     public float getMontoOfrecido() throws IllegalArgumentException {
-        String txt = minuto.getText();
+        String txt = monto.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Campo no puede estar vacío, intente otra vez.");
 
         float resultado = 0.0f;
