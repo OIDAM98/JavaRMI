@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -116,7 +117,8 @@ public class SubastaVista {
         descripcionProd.setEditable(false);
         descripcionProd.setLineWrap(true);
         descripcionProd.setWrapStyleWord(true);
-        //scroll.setPreferredSize(new Dimension(usuario.getWidth(), usuario.getHeight()));
+        // scroll.setPreferredSize(new Dimension(usuario.getWidth(),
+        // usuario.getHeight()));
 
         productoInfo.add(obtenerLista);
         productoInfo.add(scroll);
@@ -213,7 +215,6 @@ public class SubastaVista {
     }
 
     public String getUsuario() {
-
         return usuario.getText();
     }
 
@@ -222,11 +223,34 @@ public class SubastaVista {
     }
 
     public String getEmail() {
+        String emailTest = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+
+        if (!usuario.getText().matches(emailTest)) {
+            JOptionPane.showMessageDialog(huehuenose, "Error en email! Insertar email correcto");
+        }
+
         return email.getText();
     }
 
     public String getTelefono() {
-        return telefono.getText();
+
+        int resultado = 0;
+
+        try {
+
+            resultado = Integer.parseInt(telefono.getText());
+            if (resultado < 0) {
+                throw new Exception();
+            }
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(huehuenose, "Error en tel! Insertar numero correcto");
+            System.out.println("Hay problemas con el año de la oferta");
+
+        }
+
+        return resultado;
     }
 
     public String getNickname() {
@@ -245,7 +269,6 @@ public class SubastaVista {
     }
 
     public String getProducto() {
-
         return producto.getText();
     }
 
@@ -260,9 +283,12 @@ public class SubastaVista {
         try {
 
             resultado = Float.parseFloat(precioInicial.getText());
+            if (resultado) {
+                throw new Exception();
+            }
 
         } catch (Exception e) {
-
+            JOptionPane.showMessageDialog(huehuenose, "Error en precio inical! Insertar numero correcto");
             System.out.println("Hay problemas con el precio inicial");
         }
 
@@ -275,10 +301,15 @@ public class SubastaVista {
         try {
 
             resultado = Integer.parseInt(año.getText());
+            if (resultado < 2019) {
+                throw new Exception();
+            }
 
         } catch (Exception e) {
 
+            JOptionPane.showMessageDialog(huehuenose, "Error en a;o! Insertar numero correcto");
             System.out.println("Hay problemas con el año de la oferta");
+
         }
 
         return resultado;
@@ -290,9 +321,13 @@ public class SubastaVista {
         try {
 
             resultado = Integer.parseInt(mes.getText());
+            if (resultado < 0 || resultado > 12) {
+                throw new Exception();
+            }
 
         } catch (Exception e) {
 
+            JOptionPane.showMessageDialog(huehuenose, "Error en Mes! Insertar numero correcto");
             System.out.println("Hay problemas con el mes de la oferta");
         }
 
@@ -305,9 +340,13 @@ public class SubastaVista {
         try {
 
             resultado = Integer.parseInt(dia.getText());
+            if (resutlado < 0 || resultado > 31) {
+                throw new Exception();
+            }
 
         } catch (Exception e) {
 
+            JOptionPane.showMessageDialog(huehuenose, "Error en dia! Insertar numero correcto");
             System.out.println("Hay problemas con el dia de la oferta");
         }
 
@@ -320,9 +359,13 @@ public class SubastaVista {
         try {
 
             resultado = Integer.parseInt(hora.getText());
+            if (resultado < 0 || resutlado > 12) {
+                throw new Exception();
+            }
 
         } catch (Exception e) {
 
+            JOptionPane.showMessageDialog(huehuenose, "Error en hora! Insertar numero correcto");
             System.out.println("Hay problemas con el precio inicial");
         }
 
@@ -335,9 +378,13 @@ public class SubastaVista {
         try {
 
             resultado = Integer.parseInt(minuto.getText());
+            if (resultado < 0 || resultado > 60) {
+                throw new Exception();
+            }
 
         } catch (Exception e) {
 
+            JOptionPane.showMessageDialog(huehuenose, "Error en minuto! Insertar numero correcto");
             System.out.println("Hay problemas con el precio inicial");
         }
 
@@ -369,7 +416,6 @@ public class SubastaVista {
     public void desplegarDescripcion(String context) {
 
         descripcionProd.setText(context);
-        
 
     }
 
