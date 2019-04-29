@@ -1,11 +1,25 @@
 package subasta;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 
 public class SubastaVista {
 
@@ -40,14 +54,13 @@ public class SubastaVista {
     JButton obtenerLista;
     JButton ofrecer;
 
-    private static final Font FONT = new Font("Arial", Font.BOLD,14);
+    private static final Font FONT = new Font("Arial", Font.BOLD, 14);
 
     public SubastaVista() {
 
-        try{
+        try {
             controller = new SubastaControlador(this);
-        }
-        catch (RemoteException ex) {
+        } catch (RemoteException ex) {
             ex.printStackTrace();
             System.exit(1);
         }
@@ -73,6 +86,7 @@ public class SubastaVista {
         accionesUsuario.add(conectar);
         ponerALaVenta = new JButton("Poner a la venta");
         accionesUsuario.add(ponerALaVenta);
+        ponerALaVenta.setEnabled(false);
 
         north.add(usuarioDatos, BorderLayout.NORTH);
         north.add(accionesUsuario, BorderLayout.SOUTH);
@@ -109,6 +123,7 @@ public class SubastaVista {
         monto = new JTextField();
         ofrecer = new JButton("Ofrecer");
         ofrecerProd.add(ofrecer);
+        ofrecer.setEnabled(false);
         ofrecerProd.add(monto);
         south.add(ofrecerProd, BorderLayout.CENTER);
 
@@ -238,6 +253,12 @@ public class SubastaVista {
 
     }
 
+    public void activateButtons() {
+        ofrecer.setEnabled(true);
+        ponerALaVenta.setEnabled(true);
+        conectar.setEnabled(false);
+    }
+
     public JPanel getUserPanel() {
         return userPanel;
     }
@@ -253,7 +274,7 @@ public class SubastaVista {
     public String getEmail() {
         String emailTest = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 
-        if (!usuario.getText().matches(emailTest)) {
+        if (!email.getText().matches(emailTest)) {
             JOptionPane.showMessageDialog(principal, "Error en email! Insertar email correcto");
         }
 
@@ -266,9 +287,13 @@ public class SubastaVista {
 
         try {
 
-            int phone = Integer.parseInt(telefono.getText());
+            if (telefono.getText() == resultado) {
+                throw new Exception();
+            } else {
+                int phone = Integer.parseInt(telefono.getText());
 
-            resultado = String.valueOf(phone);
+                resultado = String.valueOf(phone);
+            }
 
         } catch (Exception e) {
 
@@ -303,14 +328,15 @@ public class SubastaVista {
         return descripcion.getText();
     }
 
-    public float getPrecioInicial() throws IllegalArgumentException{
+    public float getPrecioInicial() throws IllegalArgumentException {
         String txt = precioInicial.getText();
-        if(txt.length() == 0) throw new IllegalArgumentException("Campo no puede estar vacío, intente otra vez.");
+        if (txt.length() == 0)
+            throw new IllegalArgumentException("Campo no puede estar vacío, intente otra vez.");
         float resultado = 0.0f;
         resultado = Float.parseFloat(precioInicial.getText());
-        /*if (resultado < 0) {
-            throw new Exception();
-        }*/
+        /*
+         * if (resultado < 0) { throw new Exception(); }
+         */
 
         return resultado;
     }
