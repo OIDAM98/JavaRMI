@@ -4,7 +4,7 @@ Todo list for RMI
 This is only for testing
 
 ## Model Classes
-* subasta.Oferta
+* subasta.Bid
 * subasta.Cliente
 * subasta.Producto
 - [ ] Add comments to each one
@@ -21,7 +21,7 @@ This is only for testing
     * Backup plan: Text file (maybe csv)
 - [x] Make server interface (extends Remote)
 - [x] Make server servant (implement previous point)
-- [ ] Make server propagate changes to ALL clients
+- [x] Make server propagate changes to ALL clients
     * Connect controller with server => server has list of controllers
 
 ## Controller
@@ -30,7 +30,7 @@ This is only for testing
 - [x] Connect with GUI
 
 ## Client (GUI)
-- [ ] Modify current GUI to display added information
+- [x] Modify current GUI to display added information
 - [x] Add login view/window
 
 ## After

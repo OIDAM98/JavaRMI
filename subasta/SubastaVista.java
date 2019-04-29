@@ -1,25 +1,11 @@
 package subasta;
 
-import java.awt.BorderLayout;
-import java.awt.ComponentOrientation;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.rmi.RemoteException;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.*;
 
 public class SubastaVista {
 
@@ -45,8 +31,7 @@ public class SubastaVista {
     JTextField minuto;
     JPanel productPanel;
 
-    DefaultComboBoxModel productos;
-    JLabel precioActual;
+    DefaultListModel<Producto> productos;
     JTextArea descripcionProd;
     JList lista;
     JButton conectar;
@@ -55,17 +40,23 @@ public class SubastaVista {
     JButton obtenerLista;
     JButton ofrecer;
 
+    private static final Font FONT = new Font("Arial", Font.BOLD,14);
+
     public SubastaVista() {
 
-        controller = new SubastaControlador(this);
+        try{
+            controller = new SubastaControlador(this);
+        }
+        catch (RemoteException ex) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
 
-        // JFrame.setDefaultLookAndFeelDecorated( true );
         Container panel;
 
         principal = new JFrame("Cliente Subasta");
         panel = principal.getContentPane();
         panel.setLayout(new BorderLayout());
-        // panel.setLayout(new GridLayout(0, 2));
 
         JPanel north = new JPanel();
         north.setLayout(new BorderLayout());
@@ -87,40 +78,31 @@ public class SubastaVista {
         north.add(accionesUsuario, BorderLayout.SOUTH);
         panel.add(north, BorderLayout.NORTH);
 
-        productos = new DefaultComboBoxModel();
+        productos = new DefaultListModel<>();
         lista = new JList(productos); // data has type Object[]
         lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lista.setLayoutOrientation(JList.VERTICAL);
+        lista.setFont(FONT);
         JScrollPane listaScroller = new JScrollPane(lista);
         listaScroller.setPreferredSize(new Dimension(250, 80));
         panel.add(listaScroller, BorderLayout.CENTER);
 
-        // producto = new JTextField();
-        // precioInicial = new JTextField();
-        // panel.add(new JLabel("Producto a ofrecer"));
-        // panel.add(producto);
-        // panel.add(new JLabel("Precio inicial"));
-        // panel.add(precioInicial);
-
         JPanel south = new JPanel();
         south.setLayout(new BorderLayout());
         JPanel productoInfo = new JPanel();
-        productoInfo.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 5));
-        productoInfo.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        productoInfo.setLayout(new GridLayout(1, 2));
         JPanel ofrecerProd = new JPanel();
         ofrecerProd.setLayout(new GridLayout(1, 2));
 
-        obtenerLista = new JButton("Obtener lista");
-        productoInfo.add(new JLabel("Descripcion: "));
+        JLabel desc = new JLabel("Descripcion: ");
+        productoInfo.add(desc);
         descripcionProd = new JTextArea();
         JScrollPane scroll = new JScrollPane(descripcionProd);
         descripcionProd.setEditable(false);
         descripcionProd.setLineWrap(true);
         descripcionProd.setWrapStyleWord(true);
-        // scroll.setPreferredSize(new Dimension(usuario.getWidth(),
-        // usuario.getHeight()));
+        scroll.setPreferredSize(new Dimension(principal.getWidth(), 30));
 
-        productoInfo.add(obtenerLista);
         productoInfo.add(scroll);
         south.add(productoInfo, BorderLayout.NORTH);
 
@@ -134,32 +116,24 @@ public class SubastaVista {
         south.add(salir, BorderLayout.SOUTH);
         panel.add(south, BorderLayout.SOUTH);
 
-        principal.setSize(400, 400);
+        createUserPanel();
+        createProductPanel();
+        initializeListeners();
+
+        principal.setSize(500, 500);
+        principal.setMinimumSize(new Dimension(600, 500));
         principal.setVisible(true);
-        principal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        initializatePanels();
-
-        asignarActionListener(controller);
-        asignarListSelectionListener(controller);
-    }
-
-    public void asignarActionListener(ActionListener controlador) {
-
-        conectar.addActionListener(controlador);
-        salir.addActionListener(controlador);
-        ponerALaVenta.addActionListener(controlador);
-        obtenerLista.addActionListener(controlador);
-        ofrecer.addActionListener(controlador);
+        principal.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        principal.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exitApp();
+            }
+        });
 
     }
 
-    public void asignarListSelectionListener(ListSelectionListener controlador) {
-
-        lista.addListSelectionListener(controlador);
-    }
-
-    private void initializatePanels() {
+    private void createUserPanel() {
         userPanel = new JPanel();
         userPanel.setLayout(new GridLayout(0, 2));
         direccion = new JTextField();
@@ -174,6 +148,9 @@ public class SubastaVista {
         nickname = new JTextField();
         userPanel.add(new JLabel("Nickname:"));
         userPanel.add(nickname);
+    }
+
+    private void createProductPanel() {
 
         productPanel = new JPanel();
         productPanel.setLayout(new GridLayout(0, 2));
@@ -208,6 +185,57 @@ public class SubastaVista {
         minuto = new JTextField();
         productPanel.add(new JLabel("Minutos (0 a 59):"));
         productPanel.add(minuto);
+    }
+
+    private void initializeListeners() {
+
+        conectar.addActionListener(e -> {
+            try {
+                controller.connectUser();
+            } catch (RemoteException ex) {
+                System.out.println("Error al conectar usuario");
+            }
+        });
+
+        salir.addActionListener(e -> exitApp());
+
+        ponerALaVenta.addActionListener(e -> {
+            try {
+                controller.putOnSale();
+            } catch (RemoteException ex) {
+                System.out.println("Error al poner en venta un producto");
+            }
+        });
+
+        ofrecer.addActionListener(e -> {
+            try {
+                controller.offerOnProduct();
+            } catch (RemoteException ex) {
+                System.out.println("Error al ofrecer en producto");
+            }
+        });
+
+        lista.addListSelectionListener(e -> {
+            try {
+
+                if (e.getValueIsAdjusting() == false) {
+                    JList lista = (JList) e.getSource();
+                    Producto item = (Producto) lista.getSelectedValue();
+                    controller.changeDescription(item);
+
+                }
+            } catch (RemoteException ex) {
+                System.out.println("Error al cambiar la descripcion");
+            }
+        });
+    }
+
+    private void exitApp() {
+
+        controller.disconnect();
+
+        System.exit(1);
+
     }
 
     public JPanel getUserPanel() {
@@ -405,6 +433,8 @@ public class SubastaVista {
     public void reinicializaListaProductos() {
 
         productos.removeAllElements();
+        descripcionProd.setText("");
+
     }
 
     public void agregaProducto(Producto prod) {
