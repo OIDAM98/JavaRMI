@@ -534,7 +534,7 @@ public class Client {
     }
 
     /**
-     * Returns the hour of the product's offer limit date,
+     * Returns the minutes of the product's offer limit date,
      * asked when a new {@code Product} is added to the {@code Server}.
      *     - Retrieves text from {@code minuteField}.
      *         - Cannot be empty.
