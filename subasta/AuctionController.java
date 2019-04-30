@@ -370,7 +370,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
     - Shows the user the contact information of the buyer.
      */
     public void notifyEndBid(User c, Product p) {
-        if(c.name.equalsIgnoreCase(getUser())) { //If the buyer is not the current user
+        if(c.getName().equalsIgnoreCase(getUser())) { //If the buyer is not the current user
             JPanel panel = new JPanel(); //Creates panel where information will be displayed
             panel.setLayout(new BorderLayout());
 

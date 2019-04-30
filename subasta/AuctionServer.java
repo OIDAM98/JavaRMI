@@ -192,9 +192,9 @@ public class AuctionServer implements Server {
             Product infoProd = products.get(product); //Get the product based on the specified name
             User user = users.get(buyer); //Get the user based on the specified name
 
-            if (infoProd.updatePrice(amount, user.name)) { //If price of product can be updated with bid
+            if (infoProd.updatePrice(amount, user.getName())) { //If price of product can be updated with bid
 
-                bidHistory.add(new Bid(user.name, infoProd.getName(), infoProd.getCurrentPrice())); //Adds to history about new change made
+                bidHistory.add(new Bid(user.getName(), infoProd.getName(), infoProd.getCurrentPrice())); //Adds to history about new change made
                 this.updateClients(); //Updates all clients about the update done.
                 return true;
 

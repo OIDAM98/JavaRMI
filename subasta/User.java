@@ -13,18 +13,25 @@ import java.io.Serializable;
 
 public class User implements Serializable {
 
-    String name;
-    String direction;
-    String email;
-    String phone;
-    String nickname;
+    private String name;
+    private String direction;
+    private String email;
+    private String phone;
+    private String nickname;
 
-    public User(String nombre, String direccion, String email, String telefono, String nickname) {
-        this.name = nombre;
-        this.direction = direccion;
-        this.email = email;
-        this.phone = telefono;
-        this.nickname = nickname;
+    public User(String n, String d, String e, String p, String nn) {
+        this.name = n;
+        this.direction = d;
+        this.email = e;
+        this.phone = p;
+        this.nickname = nn;
+    }
+
+    /*
+    Returns this user's name
+     */
+    public String getName() {
+        return name;
     }
 
     @Override
