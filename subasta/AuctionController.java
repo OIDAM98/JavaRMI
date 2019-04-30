@@ -14,9 +14,9 @@ import javax.swing.*;
 
 public class AuctionController extends UnicastRemoteObject implements Controller {
 
-    Client view; //View
-    Server model; //Server
-    Hashtable<String, String> listDescription; //List of descriptions
+    private Client view; //View
+    private Server model; //Server
+    private Hashtable<String, String> listDescription; //List of descriptions
 
     /*
     Constructor, receives a View:
@@ -35,11 +35,14 @@ public class AuctionController extends UnicastRemoteObject implements Controller
         //If server is not found
         catch (NotBoundException e) {
             //Notify user of error
-            JOptionPane.showMessageDialog(null,
-                    "Error al conectarse al servidor!",
-                    "Conectar al servidor",
-                    JOptionPane.ERROR_MESSAGE);
-            //System.exit(1);
+            int result = JOptionPane.showConfirmDialog(null,
+                    view.getUserPanel(),
+                    "Dar de alta un userField",
+                    JOptionPane.OK_OPTION);
+            //Exit program
+            if(result == JOptionPane.OK_OPTION || result == JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION) {
+                System.exit(1);
+            }
         }
     }
 
@@ -377,7 +380,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
             //Header panel
             JPanel north = new JPanel();
             north.setLayout(new GridLayout(2, 1));
-            north.add(new JLabel("Subasta para el name" + p.getName() + " finalizó con exito!")); //Shows the product bought
+            north.add(new JLabel("Subasta para el name " + p.getName() + " finalizó con exito!")); //Shows the product bought
             north.add(new JLabel("Datos del comprador:"));
             panel.add(north, BorderLayout.NORTH); //Adds this panel to the main one.
 
