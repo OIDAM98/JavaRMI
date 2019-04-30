@@ -13,7 +13,7 @@ public interface Controller extends Remote {
 
   void offerOnProduct() throws RemoteException;
 
-  void changeDescription(Producto item) throws RemoteException;
+  void changeDescription(Product item) throws RemoteException;
 
   void updateView() throws RemoteException;
 
@@ -21,6 +21,6 @@ public interface Controller extends Remote {
 
   String getUser() throws RemoteException;
 
-  void notifyEndBid(Cliente client, Producto prod) throws RemoteException;
+  void notifyEndBid(User client, Product prod) throws RemoteException;
 
 }

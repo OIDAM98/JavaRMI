@@ -14,9 +14,9 @@ import javax.swing.*;
 
 public class AuctionController extends UnicastRemoteObject implements Controller {
 
-    SubastaVista vista; //View
-    Servidor modelo; //Server
-    Hashtable<String, String> listaDescripcion; //List of descriptions
+    Client view; //View
+    Server model; //Server
+    Hashtable<String, String> listDescription; //List of descriptions
 
     /*
     Constructor, receives a View:
@@ -25,12 +25,12 @@ public class AuctionController extends UnicastRemoteObject implements Controller
             - If found, binds it to this Controller.
             - Else, notifies user of error.
      */
-    public AuctionController(SubastaVista v) throws RemoteException {
-        vista = v;
+    public AuctionController(Client v) throws RemoteException {
+        view = v; //Binds View to Controller
         //Searches for server
         try {
-            Registry registry = LocateRegistry.getRegistry();
-            modelo = (Servidor) registry.lookup("subasta");
+            Registry registry = LocateRegistry.getRegistry(); //Gets registry
+            model = (Server) registry.lookup("subasta"); //Searches for server named as subasta.
         }
         //If server is not found
         catch (NotBoundException e) {
@@ -59,38 +59,39 @@ public class AuctionController extends UnicastRemoteObject implements Controller
         try {
 
             //Retrieve user from View.
-            String usuario = vista.getUsuario();
+            String user = view.getCurrentUser();
 
-            if (!modelo.existeUsuario(usuario)) { //If user doesn't exist on server
-                System.out.println("Registrando usuario: " + usuario);
+            if (!model.userExists(user)) { //If user doesn't exist on server
+                System.out.println("Registering user: " + user);
 
                 //Shoe dialog to fill information about new client
                 int result = JOptionPane.showConfirmDialog(null,
-                        vista.getUserPanel(),
-                        "Dar de alta un usuario",
+                        view.getUserPanel(),
+                        "Dar de alta un userField",
                         JOptionPane.OK_CANCEL_OPTION);
 
                 if (result == JOptionPane.OK_OPTION) {
                     try {
-                        String direccion = vista.getDireccion(); //Get direction from user
-                        String email = vista.getEmail(); //Get email from user
-                        String telefono = vista.getTelefono(); //Get phone number from user
-                        String nickname = vista.getNickname(); //Get nickname from user
-                        Cliente nuevoCliente = new Cliente(usuario, direccion, email, telefono, nickname); //Create new user to be subscribed
+                        String direction = view.getDirection(); //Get directionField from user
+                        String email = view.getEmail(); //Get emailField from user
+                        String phone = view.getPhone(); //Get phone number from user
+                        String nickname = view.getNickname(); //Get nicknameField from user
+                        User newClient = new User(user, direction, email, phone, nickname); //Create new user to be subscribed
                         //Print on console information about new user
-                        String printy = String.format("%s %s %s %s %s", usuario, direccion, email, telefono, nickname);
+                        String printy = String.format("%s %s %s %s %s", user, direction, email, phone, nickname);
                         System.out.println(printy);
 
                         //If registration of new user was successful
-                        if (modelo.registraUsuario(usuario, nuevoCliente)) {
+                        if (model.registerUser(user, newClient)) {
                             //Subscribe Controller to server
-                            modelo.subscribe(this);
+                            model.subscribe(this);
                             //Show user that connection and registration to server was successful
                             JOptionPane.showMessageDialog(null,
                                     "Cliente dado de alta con éxito!",
                                     "Dar de alta cliente",
                                     JOptionPane.INFORMATION_MESSAGE);
-                            vista.activateButtons();
+                            //Activate corresponding buttons on the View
+                            view.activateButtons();
                         } else { //If there was a problem doing the registration on server side
                             //Show user about error
                             JOptionPane.showMessageDialog(null,
@@ -112,7 +113,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
                                 JOptionPane.ERROR_MESSAGE);
                     }
                     finally { //At the end of this operation, restart panel of user to default.
-                        vista.resetUserPanel();
+                        view.resetUserPanel();
                     }
 
                 }
@@ -120,11 +121,12 @@ public class AuctionController extends UnicastRemoteObject implements Controller
             //If user exists on the server side during this session
             else {
                 //Subscribe controller to server
-                modelo.subscribe(this);
-                vista.activateButtons();
+                model.subscribe(this);
+                //Activates the corresponding buttons on view
+                view.activateButtons();
                 //Notify that the user has returned to the session successfully
                 JOptionPane.showMessageDialog(null,
-                        "Bienvenido de regreso " + usuario + "!",
+                        "Bienvenido de regreso " + user + "!",
                         "Dar de alta cliente",
                         JOptionPane.INFORMATION_MESSAGE);
             }
@@ -149,7 +151,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
     - Retrieves the current user.
     - Asks the user for the information of product to be offered.
     - If the product wasn't on sale before:
-        - Gets the amont to be offered.
+        - Gets the amount to be offered.
         - Gets the time and date of the offer.
         - Creates the Product object to be offered.
         - Adds the bid to the server.
@@ -157,71 +159,71 @@ public class AuctionController extends UnicastRemoteObject implements Controller
     - Else, notifies the user that the product was on sale before.
      */
     public void putOnSale() throws RemoteException {
-        String usuario = vista.getUsuario(); //Gets user from View
+        String user = view.getCurrentUser(); //Gets user from View
 
         //Show user the panel to give information about product.
         int result = JOptionPane.showConfirmDialog(null,
-                vista.getProductPanel(),
-                "Datos para ofrecer producto",
+                view.getProductPanel(),
+                "Datos para makeBid name",
                 JOptionPane.OK_CANCEL_OPTION);
 
-        String producto = vista.getProducto(); //Gets product from view
+        String product = view.getProductName(); //Gets product from view
 
-        if(producto.length() != 0) { //If product wasn't left empty
+        if(product.length() > 0) { //If product wasn't left empty
 
-            if (!modelo.existeProducto(producto)) { //If product wasn't offered before
+            if (!model.productExists(product)) { //If product wasn't offered before
 
-                System.out.println("Haciendo oferta del producto: " + producto);
+                System.out.println("Haciendo oferta del name: " + product);
 
                 if (result == JOptionPane.OK_OPTION) {
                     try{
-                        float monto = vista.getPrecioInicial(); //Gets amount of product
-                        String descripcion = vista.getDescripcionProducto(); //Gets description of product
+                        float amount = view.getProductPrice(); //Gets amount of product
+                        String description = view.getProductDescription(); //Gets description of product
                         //Gets date and time limit for the offers on this product to be made
-                        int año = vista.getAñoOferta();
-                        int mes = vista.getMesOferta();
-                        int dia = vista.getDiaOferta();
-                        int hora = vista.getHoraOferta();
-                        int minutos = vista.getMinutoOferta();
+                        int year = view.getOfferYear();
+                        int month = view.getOfferMonth();
+                        int day = view.getOfferDay();
+                        int hour = view.getOfferHour();
+                        int minutes = view.getOfferMinutes();
 
                         //If time of offer is not allowed, throw new Exception informing of this error
-                        if(checkTimeOfOffer(hora, minutos))
+                        if(checkTimeOfOffer(hour, minutes))
                             throw new IllegalArgumentException("La subasta debe de tener al menos dos minutos de tiempo activo");
 
                         //Constructs new LocalDateTime to be included on the product's information
-                        LocalDateTime fecha = LocalDateTime.of(año, mes, dia, hora, minutos);
+                        LocalDateTime fecha = LocalDateTime.of(year, month, day, hour, minutes);
                         //Constructs new product to be offered
-                        Producto ofrecer = new Producto(usuario, producto, descripcion, monto, fecha);
+                        Product offer = new Product(user, product, description, amount, fecha);
 
                         //If the product was successfully registered on server's side
-                        if (modelo.agregaProductoALaVenta(usuario, producto, ofrecer)) {
+                        if (model.addProductToAuction(user, product, offer)) {
                             //Notify user of success on this operation
                             JOptionPane.showMessageDialog(null,
                                     "Producto ofrecido con éxito!",
-                                    "Ofrecer producto",
+                                    "Ofrecer name",
                                     JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             //Notify user of error on this operation
                             JOptionPane.showMessageDialog(null,
-                                    "Hubo un error al ofrecer el producto.",
-                                    "Ofrecer producto",
+                                    "Hubo un error al makeBid el name.",
+                                    "Ofrecer name",
                                     JOptionPane.ERROR_MESSAGE);
                         }
                     }
                     catch (NumberFormatException ex) { //If a number wasn't introduced on the numeric fields
                         JOptionPane.showMessageDialog(null,
                                 "Campo debe de contener solamente numeros",
-                                "Subastar producto",
+                                "Subastar name",
                                 JOptionPane.ERROR_MESSAGE);
                     }
                     catch (IllegalArgumentException ex) { //If there was an error with the data introduced
                         JOptionPane.showMessageDialog(null,
                                 ex.getMessage(),
-                                "Subastar producto",
+                                "Subastar name",
                                 JOptionPane.ERROR_MESSAGE);
                     }
                     finally { //At the end of this operation, restart to default the product information panel
-                        vista.resetProductPanel();
+                        view.resetProductPanel();
                     }
                 }
             }
@@ -230,7 +232,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
                 //Notify user of this case
                 JOptionPane.showMessageDialog(null,
                         "Producto ya se encuentra en venta.",
-                        "Subastar producto",
+                        "Subastar name",
                         JOptionPane.ERROR_MESSAGE);
             }
 
@@ -239,8 +241,8 @@ public class AuctionController extends UnicastRemoteObject implements Controller
         else {
             //Tell user of the need to introduce a product to put on sale
             JOptionPane.showMessageDialog(null,
-                    "Ingrese producto a subastar.",
-                    "Subastar producto",
+                    "Ingrese name a subastar.",
+                    "Subastar name",
                     JOptionPane.ERROR_MESSAGE);
         }
 
@@ -248,7 +250,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
 
     /*
     Checks if hours and minutes are greater than the current time by two minutes.
-    In order to leave enough time for offers to be made on during the specified time.
+    This is done in order to leave enough time for offers to be made on during the specified time.
     - Gets the current date and time.
     - Checks if the current minutes plus two are less or equals than 59:
         - If true, checks that the introduced hour is equal or greater than the current hour AND
@@ -277,13 +279,13 @@ public class AuctionController extends UnicastRemoteObject implements Controller
      */
     public void updateProductList() throws RemoteException {
 
-        List<Producto> lista = modelo.obtieneCatalogo(); //Get catalog on server
-        listaDescripcion = new Hashtable<>(); //Reconstruct list of descriptions
-        vista.reinicializaListaProductos(); //Reinitialize the products shown on View
+        List<Product> catalog = model.getCatalog(); //Get catalog on server
+        listDescription = new Hashtable<>(); //Reconstruct list of descriptions
+        view.resetProductList(); //Reinitialize the products shown on View
 
-        lista.forEach(prod -> { //For each product
-            listaDescripcion.put(prod.producto, prod.descripcion); //Put the name of product and its description on the list
-            vista.agregaProducto(prod); //Add product to View to be displayed
+        catalog.forEach(prod -> { //For each product
+            listDescription.put(prod.name, prod.description); //Put the name of product and its description on the list
+            view.addProduct(prod); //Add product to View to be displayed
         });
 
     }
@@ -300,24 +302,24 @@ public class AuctionController extends UnicastRemoteObject implements Controller
      */
     public void offerOnProduct() throws RemoteException {
         try {
-            Producto offer = vista.getProductoSeleccionado(); //Get product currently selected on View
-            float monto = vista.getMontoOfrecido(); //Get the amount to be offered on this product
-            String usuario = vista.getUsuario(); //Get current user on View
+            Product offer = view.getSelectedProduct(); //Get product currently selected on View
+            float amount = view.getAmountBid(); //Get the amount to be offered on this product
+            String user = view.getCurrentUser(); //Get current user on View
 
-            modelo.agregaOferta(usuario, offer.producto, monto); //Add the offer on the server
+            model.addOffer(user, offer.name, amount); //Add the offer on the server
         }
         catch (IllegalArgumentException ex) {//If there was an error on the introduced amount to offer
             //Displays the user the message of the error caught.
             JOptionPane.showMessageDialog(null,
                     ex.getMessage(),
-                    "Ofrecer en producto",
+                    "Ofrecer en name",
                     JOptionPane.ERROR_MESSAGE);
         }
         catch (NullPointerException ex) { //If no product was selected on view
             //Show user that before offering a product has to be selected
             JOptionPane.showMessageDialog(null,
-                    "Debe seleccionar un producto para ofrecer.",
-                    "Ofrecer en producto",
+                    "Debe seleccionar un name para makeBid.",
+                    "Ofrecer en name",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -326,11 +328,11 @@ public class AuctionController extends UnicastRemoteObject implements Controller
     Changes the description of the View depending on the desired item.
     - Method to be called when an item is selected on the list of products of the View.
      */
-    public void changeDescription(Producto item) {
+    public void changeDescription(Product item) {
         if (item != null) { //If item is not null
             System.out.println(item); //Prints item information
-            String context = listaDescripcion.get(item.producto); //Gets description from list of descriptions
-            vista.desplegarDescripcion(context); //Display this description on View
+            String context = listDescription.get(item.name); //Gets description from list of descriptions
+            view.showDescription(context); //Display this description on View
         }
     }
 
@@ -346,7 +348,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
      */
     public void disconnect() {
         try{
-            modelo.unsubscribe(this); //Unsubscribe this Controller of server
+            model.unsubscribe(this); //Unsubscribe this Controller of server
         }
         catch (RemoteException ex) { //If there was an error connecting to the server
             System.out.println("Error al desconectarse del servidor");
@@ -358,7 +360,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
     Method to be called by server to know the current User of the Controller.
      */
     public String getUser() {
-        return vista.getUsuario(); //Retrieves user from View
+        return view.getCurrentUser(); //Retrieves user from View
     }
 
     /*
@@ -367,15 +369,15 @@ public class AuctionController extends UnicastRemoteObject implements Controller
     - Constructs a panel where the information of the buyer will be displayed in.
     - Shows the user the contact information of the buyer.
      */
-    public void notifyEndBid(Cliente c, Producto p) {
-        if(c.nombre != getUser()) { //If the buyer is not the current user
+    public void notifyEndBid(User c, Product p) {
+        if(c.name.equalsIgnoreCase(getUser())) { //If the buyer is not the current user
             JPanel panel = new JPanel(); //Creates panel where information will be displayed
             panel.setLayout(new BorderLayout());
 
             //Header panel
             JPanel north = new JPanel();
             north.setLayout(new GridLayout(2, 1));
-            north.add(new JLabel("Subasta para el producto" + p.producto + " finalizó con exito!")); //Shows the product bought
+            north.add(new JLabel("Subasta para el name" + p.name + " finalizó con exito!")); //Shows the product bought
             north.add(new JLabel("Datos del comprador:"));
             panel.add(north, BorderLayout.NORTH); //Adds this panel to the main one.
 
@@ -391,7 +393,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
         else { //If the highest bid was made by the current user
             //Inform the user that he/she was the highest bidder
             JOptionPane.showConfirmDialog(null,
-                    "Usted quien ofrecio más por " + p.producto,
+                    "Usted quien ofrecio más por " + p.name,
                     "Datos del comprador",
                     JOptionPane.OK_OPTION);
         }

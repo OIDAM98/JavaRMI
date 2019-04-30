@@ -12,37 +12,37 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Producto implements Serializable {
+public class Product implements Serializable {
 
-    String vendedor;
-    String vendedorActual;
-    String producto;
-    String descripcion;
-    float precioInicial;
-    float precioActual;
-    LocalDateTime fechaCierre;
+    String seller;
+    String lastBidder;
+    String name;
+    String description;
+    float firstPrice;
+    float currentPrice;
+    LocalDateTime closingDate;
     private boolean isActive;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
-    public Producto(String v, String p, String d, float pi, LocalDateTime fc ) {
+    public Product(String v, String p, String d, float pi, LocalDateTime fc ) {
 
-        vendedor = v;
-        vendedorActual = v;
-        producto = p;
-        descripcion = d;
-        precioInicial = pi;
-        precioActual = pi;
-        fechaCierre = fc;
+        seller = v;
+        lastBidder = v;
+        name = p;
+        description = d;
+        firstPrice = pi;
+        currentPrice = pi;
+        closingDate = fc;
         isActive = true;
 
     }
 
     public boolean actualizaPrecio( float monto, String user ) {
 
-        if( monto > precioActual ) {
-            precioActual = monto;
-            vendedorActual = user;
+        if( monto > currentPrice) {
+            currentPrice = monto;
+            lastBidder = user;
             return true;
         } else
             return false;
@@ -50,12 +50,12 @@ public class Producto implements Serializable {
 
     public String getNombreProducto() {
 
-        return producto;
+        return name;
     }
 
-    public float getPrecioActual() {
+    public float getCurrentPrice() {
 
-        return precioActual;
+        return currentPrice;
     }
 
     public boolean isActive() {
@@ -69,10 +69,10 @@ public class Producto implements Serializable {
     @Override
     public String toString() {
         return String.format("%-10s Precio: %-10.2f Por: %-10s Fecha limite: %s",
-                producto,
-                precioActual,
-                vendedorActual,
-                fechaCierre.format(FORMATTER)
+                name,
+                currentPrice,
+                lastBidder,
+                closingDate.format(FORMATTER)
         );
     }
 }

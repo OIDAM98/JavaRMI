@@ -6,42 +6,41 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 
-public class SubastaVista {
+public class Client {
 
     AuctionController controller;
 
-    JFrame principal;
+    JFrame mainFrame;
 
-    JTextField usuario;
-    JTextField direccion;
-    JTextField email;
-    JTextField telefono;
-    JTextField nickname;
+    JTextField userField;
+    JTextField directionField;
+    JTextField emailField;
+    JTextField phoneField;
+    JTextField nicknameField;
     JPanel userPanel;
 
-    JTextField producto;
-    JTextField monto;
-    JTextField descripcion;
-    JTextField precioInicial;
-    JTextField año;
-    JTextField mes;
-    JTextField dia;
-    JTextField hora;
-    JTextField minuto;
+    JTextField productField;
+    JTextField descriptionField;
+    JTextField priceField;
+    JTextField yearField;
+    JTextField monthField;
+    JTextField dayField;
+    JTextField hourField;
+    JTextField minuteField;
     JPanel productPanel;
+    JTextField amountField;
 
-    DefaultListModel<Producto> productos;
-    JTextArea descripcionProd;
-    JList lista;
-    JButton conectar;
-    JButton salir;
-    JButton ponerALaVenta;
-    JButton obtenerLista;
-    JButton ofrecer;
+    DefaultListModel<Product> products;
+    JTextArea descriptionText;
+    JList list;
+    JButton connect;
+    JButton exit;
+    JButton putOnSale;
+    JButton makeBid;
 
     private static final Font FONT = new Font("Arial", Font.BOLD, 14);
 
-    public SubastaVista() {
+    public Client() {
 
         try {
             controller = new AuctionController(this);
@@ -52,8 +51,8 @@ public class SubastaVista {
 
         Container panel;
 
-        principal = new JFrame("Cliente Subasta");
-        panel = principal.getContentPane();
+        mainFrame = new JFrame("Cliente Subasta");
+        panel = mainFrame.getContentPane();
         panel.setLayout(new BorderLayout());
 
         JPanel north = new JPanel();
@@ -63,26 +62,26 @@ public class SubastaVista {
         JPanel accionesUsuario = new JPanel();
         accionesUsuario.setLayout(new GridLayout(2, 1));
 
-        usuario = new JTextField();
-        usuarioDatos.add(new JLabel("Nombre del usuario"));
-        usuarioDatos.add(usuario);
+        userField = new JTextField();
+        usuarioDatos.add(new JLabel("Nombre del userField"));
+        usuarioDatos.add(userField);
 
-        conectar = new JButton("Conectar");
-        accionesUsuario.add(conectar);
-        ponerALaVenta = new JButton("Poner a la venta");
-        accionesUsuario.add(ponerALaVenta);
-        ponerALaVenta.setEnabled(false);
+        connect = new JButton("Conectar");
+        accionesUsuario.add(connect);
+        putOnSale = new JButton("Poner a la venta");
+        accionesUsuario.add(putOnSale);
+        putOnSale.setEnabled(false);
 
         north.add(usuarioDatos, BorderLayout.NORTH);
         north.add(accionesUsuario, BorderLayout.SOUTH);
         panel.add(north, BorderLayout.NORTH);
 
-        productos = new DefaultListModel<>();
-        lista = new JList(productos); // data has type Object[]
-        lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        lista.setLayoutOrientation(JList.VERTICAL);
-        lista.setFont(FONT);
-        JScrollPane listaScroller = new JScrollPane(lista);
+        products = new DefaultListModel<>();
+        list = new JList(products); // data has type Object[]
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setLayoutOrientation(JList.VERTICAL);
+        list.setFont(FONT);
+        JScrollPane listaScroller = new JScrollPane(list);
         listaScroller.setPreferredSize(new Dimension(250, 80));
         panel.add(listaScroller, BorderLayout.CENTER);
 
@@ -95,36 +94,36 @@ public class SubastaVista {
 
         JLabel desc = new JLabel("Descripcion: ");
         productoInfo.add(desc);
-        descripcionProd = new JTextArea();
-        JScrollPane scroll = new JScrollPane(descripcionProd);
-        descripcionProd.setEditable(false);
-        descripcionProd.setLineWrap(true);
-        descripcionProd.setWrapStyleWord(true);
-        scroll.setPreferredSize(new Dimension(principal.getWidth(), 30));
+        descriptionText = new JTextArea();
+        JScrollPane scroll = new JScrollPane(descriptionText);
+        descriptionText.setEditable(false);
+        descriptionText.setLineWrap(true);
+        descriptionText.setWrapStyleWord(true);
+        scroll.setPreferredSize(new Dimension(mainFrame.getWidth(), 30));
 
         productoInfo.add(scroll);
         south.add(productoInfo, BorderLayout.NORTH);
 
-        monto = new JTextField();
-        ofrecer = new JButton("Ofrecer");
-        ofrecerProd.add(ofrecer);
-        ofrecer.setEnabled(false);
-        ofrecerProd.add(monto);
+        amountField = new JTextField();
+        makeBid = new JButton("Ofrecer");
+        ofrecerProd.add(makeBid);
+        makeBid.setEnabled(false);
+        ofrecerProd.add(amountField);
         south.add(ofrecerProd, BorderLayout.CENTER);
 
-        salir = new JButton("Salir");
-        south.add(salir, BorderLayout.SOUTH);
+        exit = new JButton("Salir");
+        south.add(exit, BorderLayout.SOUTH);
         panel.add(south, BorderLayout.SOUTH);
 
         createUserPanel();
         createProductPanel();
         initializeListeners();
 
-        principal.setSize(500, 500);
-        principal.setMinimumSize(new Dimension(600, 500));
-        principal.setVisible(true);
-        principal.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        principal.addWindowListener(new WindowAdapter() {
+        mainFrame.setSize(500, 500);
+        mainFrame.setMinimumSize(new Dimension(600, 500));
+        mainFrame.setVisible(true);
+        mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        mainFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 exitApp();
@@ -136,84 +135,84 @@ public class SubastaVista {
     private void createUserPanel() {
         userPanel = new JPanel();
         userPanel.setLayout(new GridLayout(0, 2));
-        direccion = new JTextField();
+        directionField = new JTextField();
         userPanel.add(new JLabel("Direccion:"));
-        userPanel.add(direccion);
-        email = new JTextField();
+        userPanel.add(directionField);
+        emailField = new JTextField();
         userPanel.add(new JLabel("Correo:"));
-        userPanel.add(email);
-        telefono = new JTextField();
+        userPanel.add(emailField);
+        phoneField = new JTextField();
         userPanel.add(new JLabel("Telefono:"));
-        userPanel.add(telefono);
-        nickname = new JTextField();
+        userPanel.add(phoneField);
+        nicknameField = new JTextField();
         userPanel.add(new JLabel("Nickname:"));
-        userPanel.add(nickname);
+        userPanel.add(nicknameField);
     }
 
     private void createProductPanel() {
 
         productPanel = new JPanel();
         productPanel.setLayout(new GridLayout(0, 2));
-        producto = new JTextField();
+        productField = new JTextField();
         productPanel.add(new JLabel("Nombre:"));
-        productPanel.add(producto);
-        precioInicial = new JTextField();
+        productPanel.add(productField);
+        priceField = new JTextField();
         productPanel.add(new JLabel("Precio inicial:"));
-        productPanel.add(precioInicial);
-        descripcion = new JTextField();
+        productPanel.add(priceField);
+        descriptionField = new JTextField();
         productPanel.add(new JLabel("Descripcion:"));
-        productPanel.add(descripcion);
+        productPanel.add(descriptionField);
         productPanel.add(new JLabel("Fecha de Cierre"));
         productPanel.add(new JLabel(""));
 
-        año = new JTextField();
+        yearField = new JTextField();
         productPanel.add(new JLabel("Año:"));
-        productPanel.add(año);
-        mes = new JTextField();
+        productPanel.add(yearField);
+        monthField = new JTextField();
         productPanel.add(new JLabel("Mes (1 a 12):"));
-        productPanel.add(mes);
-        dia = new JTextField();
+        productPanel.add(monthField);
+        dayField = new JTextField();
         productPanel.add(new JLabel("Dia (1 a 31):"));
-        productPanel.add(dia);
+        productPanel.add(dayField);
 
         productPanel.add(new JLabel("Tiempo de Cierre"));
         productPanel.add(new JLabel(""));
 
-        hora = new JTextField();
+        hourField = new JTextField();
         productPanel.add(new JLabel("Hora (0 a 23):"));
-        productPanel.add(hora);
-        minuto = new JTextField();
+        productPanel.add(hourField);
+        minuteField = new JTextField();
         productPanel.add(new JLabel("Minutos (0 a 59):"));
-        productPanel.add(minuto);
+        productPanel.add(minuteField);
     }
 
     private void initializeListeners() {
 
-        conectar.addActionListener(e -> controller.connectUser() );
+        connect.addActionListener(e -> controller.connectUser() );
 
-        salir.addActionListener(e -> exitApp());
+        exit.addActionListener(e -> exitApp());
 
-        ponerALaVenta.addActionListener(e -> {
+        putOnSale.addActionListener(e -> {
             try {
                 controller.putOnSale();
             } catch (RemoteException ex) {
-                System.out.println("Error al poner en venta un producto");
+                System.out.println("Error al poner en venta un name");
             }
         });
 
-        ofrecer.addActionListener(e -> {
+        makeBid.addActionListener(e -> {
             try {
                 controller.offerOnProduct();
             } catch (RemoteException ex) {
-                System.out.println("Error al ofrecer en producto");
+                System.out.println("Error al makeBid en name");
             }
         });
 
-        lista.addListSelectionListener(e -> {
+        list.addListSelectionListener(e -> {
 
             if (e.getValueIsAdjusting() == false) {
                 JList lista = (JList) e.getSource();
-                Producto item = (Producto) lista.getSelectedValue();
+                Product item = (Product) lista.getSelectedValue();
                 controller.changeDescription(item);
 
             }
@@ -230,53 +229,49 @@ public class SubastaVista {
     }
 
     public void activateButtons() {
-        ofrecer.setEnabled(true);
-        ponerALaVenta.setEnabled(true);
-        conectar.setEnabled(false);
+        makeBid.setEnabled(true);
+        putOnSale.setEnabled(true);
+        connect.setEnabled(false);
     }
 
     public JPanel getUserPanel() {
         return userPanel;
     }
 
-    public String getUsuario() {
-        String txt = usuario.getText();
-        boolean vacio = false;
-        if(txt.length() == 0) {
-            vacio = true;
+    public String getCurrentUser() {
+        String txt = userField.getText();
+        if(txt.length() == 0)
             throw new IllegalArgumentException("Usuario no puede estar vacío, intente otra vez.");
-        }
 
-        return !vacio ? txt : "";
+
+        return txt;
     }
 
-    public String getDireccion() {
-        String txt = direccion.getText();
-        boolean vacio = false;
-        if(txt.length() == 0) {
-            vacio = true;
+    public String getDirection() {
+        String txt = directionField.getText();
+        if(txt.length() == 0)
             throw new IllegalArgumentException("Direccion no puede estar vacía, intente otra vez.");
-        }
 
-        return !vacio ? txt : "";
+
+        return txt;
     }
 
     public String getEmail() {
-        String txt = email.getText();
+        String txt = emailField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Correo no puede estar vacío, intente otra vez.");
 
         String emailTest = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
-        boolean notPass = !txt.matches(emailTest);
-        if (notPass) throw new IllegalArgumentException("Correo incorrecto, intente otra vez.");
+        boolean pass = txt.matches(emailTest);
+        if (!pass) throw new IllegalArgumentException("Correo incorrecto, intente otra vez.");
 
 
-        return notPass ? txt : "";
+        return txt;
     }
 
-    public String getTelefono() throws IllegalArgumentException{
-        String txt = telefono.getText();
+    public String getPhone() throws IllegalArgumentException{
+        String txt = phoneField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Telefono no puede estar vacío, intente otra vez.");
-        if(txt.length() > 10) throw new IllegalArgumentException("Numero de telefono no puede ser mayor a 10 digitos");
+        if(txt.length() > 10) throw new IllegalArgumentException("Numero de phone no puede ser mayor a 10 digitos");
 
         String resultado = "";
         long phone = Long.parseLong(txt);
@@ -286,37 +281,37 @@ public class SubastaVista {
     }
 
     public String getNickname() throws IllegalArgumentException {
-        String txt = nickname.getText();
+        String txt = nicknameField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Nickname no puede estar vacía, intente otra vez.");
 
         return txt;
     }
 
     public void resetUserPanel() {
-        direccion.setText("");
-        email.setText("");
-        telefono.setText("");
-        nickname.setText("");
+        directionField.setText("");
+        emailField.setText("");
+        phoneField.setText("");
+        nicknameField.setText("");
     }
 
     public JPanel getProductPanel() {
         return productPanel;
     }
 
-    public String getProducto() {
-        return producto.getText();
+    public String getProductName() {
+        return productField.getText();
     }
 
-    public String getDescripcionProducto() throws IllegalArgumentException {
-        String txt = descripcion.getText();
+    public String getProductDescription() throws IllegalArgumentException {
+        String txt = descriptionField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("La descripción no puede estar vacía, intente otra vez.");
-        if(txt.length() > 30) throw new IllegalArgumentException("La descripción del producto no puede ser mayor a 30 digitos");
+        if(txt.length() > 30) throw new IllegalArgumentException("La descripción del name no puede ser mayor a 30 digitos");
 
         return txt;
     }
 
-    public float getPrecioInicial() throws IllegalArgumentException {
-        String txt = precioInicial.getText();
+    public float getProductPrice() throws IllegalArgumentException {
+        String txt = priceField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Precio no puede estar vacío, intente otra vez.");
       
         float resultado = 0;
@@ -326,8 +321,8 @@ public class SubastaVista {
         return resultado;
     }
 
-    public int getAñoOferta() throws IllegalArgumentException {
-        String txt = año.getText();
+    public int getOfferYear() throws IllegalArgumentException {
+        String txt = yearField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Año no puede estar vacío, intente otra vez.");
 
         int resultado = 0;
@@ -339,8 +334,8 @@ public class SubastaVista {
         return resultado;
     }
 
-    public int getMesOferta() throws IllegalArgumentException {
-        String txt = mes.getText();
+    public int getOfferMonth() throws IllegalArgumentException {
+        String txt = monthField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Mes no puede estar vacío, intente otra vez.");
 
         int resultado = 0;
@@ -350,8 +345,8 @@ public class SubastaVista {
         return resultado;
     }
 
-    public int getDiaOferta() throws IllegalArgumentException {
-        String txt = dia.getText();
+    public int getOfferDay() throws IllegalArgumentException {
+        String txt = dayField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Dia no puede estar vacío, intente otra vez.");
 
         int resultado = 0;
@@ -361,8 +356,8 @@ public class SubastaVista {
         return resultado;
     }
 
-    public int getHoraOferta() throws IllegalArgumentException {
-        String txt = hora.getText();
+    public int getOfferHour() throws IllegalArgumentException {
+        String txt = hourField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Hora no puede estar vacia, intente otra vez.");
 
         int resultado = 0;
@@ -372,8 +367,8 @@ public class SubastaVista {
         return resultado;
     }
 
-    public int getMinutoOferta() throws IllegalArgumentException {
-        String txt = minuto.getText();
+    public int getOfferMinutes() throws IllegalArgumentException {
+        String txt = minuteField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Minutos no pueden estar vacíos, intente otra vez.");
 
         int resultado = 0;
@@ -384,53 +379,53 @@ public class SubastaVista {
     }
 
     public void resetProductPanel() {
-        producto.setText("");
-        descripcion.setText("");
-        precioInicial.setText("");
-        año.setText("");
-        mes.setText("");
-        dia.setText("");
-        hora.setText("");
-        minuto.setText("");
+        productField.setText("");
+        descriptionField.setText("");
+        priceField.setText("");
+        yearField.setText("");
+        monthField.setText("");
+        dayField.setText("");
+        hourField.setText("");
+        minuteField.setText("");
     }
 
-    public void reinicializaListaProductos() {
+    public void resetProductList() {
 
-        productos.removeAllElements();
-        descripcionProd.setText("");
-
-    }
-
-    public void agregaProducto(Producto prod) {
-
-        productos.addElement(prod);
+        products.removeAllElements();
+        descriptionText.setText("");
 
     }
 
-    public void desplegarDescripcion(String context) {
+    public void addProduct(Product prod) {
 
-        descripcionProd.setText(context);
+        products.addElement(prod);
 
     }
 
-    public float getMontoOfrecido() throws IllegalArgumentException {
-        String txt = monto.getText();
+    public void showDescription(String context) {
+
+        descriptionText.setText(context);
+
+    }
+
+    public float getAmountBid() throws IllegalArgumentException {
+        String txt = amountField.getText();
         if(txt.length() == 0) throw new IllegalArgumentException("Campo no puede estar vacío, intente otra vez.");
 
         float resultado = 0.0f;
-        resultado = Float.parseFloat(monto.getText());
+        resultado = Float.parseFloat(amountField.getText());
         if (resultado < 0) throw new IllegalArgumentException("Precio no puede ser menor a 0, intente otra vez.");
 
         return resultado;
     }
 
-    public Producto getProductoSeleccionado() {
+    public Product getSelectedProduct() {
 
-        return (Producto) lista.getSelectedValue();
+        return (Product) list.getSelectedValue();
     }
 
     public static void main(String... args) {
-        new SubastaVista();
+        new Client();
     }
 
 }
