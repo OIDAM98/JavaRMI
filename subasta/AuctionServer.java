@@ -125,10 +125,10 @@ public class AuctionServer implements Server {
 
             System.out.println("Adding product: " + product);
             products.put(product, offer); //Add product to the hashtable
-            bidHistory.add(new Bid(user, product, offer.firstPrice)); //Add new offer to bid history
+            bidHistory.add(new Bid(user, product, offer.getInitialPrice())); //Add new offer to bid history
 
             ZoneId znid = ZoneId.systemDefault(); //Gets default Time Zone of the server
-            LocalDateTime end = offer.closingDate; //Gets closing date of the product
+            LocalDateTime end = offer.getClosingDate(); //Gets closing date of the product
             Instant endTime = end.atZone(znid).toInstant(); //Convert closing date to the default timezone
             long startTime = Instant.now().toEpochMilli(); //Gets current DateTime in milliseconds
             //Calculate difference between closing date of product and current date in milliseconds
@@ -144,7 +144,7 @@ public class AuctionServer implements Server {
                     //Set the product as no longer active
                     offer.setActive(false);
                     //Notify the seller of the product who won the auction
-                    notifyBid(offer.seller, offer);
+                    notifyBid(offer.getSeller(), offer);
                     System.out.println("Updating clients!");
                     //Update all clients of the change made
                     updateClients();
@@ -192,9 +192,9 @@ public class AuctionServer implements Server {
             Product infoProd = products.get(product); //Get the product based on the specified name
             User user = users.get(buyer); //Get the user based on the specified name
 
-            if (infoProd.actualizaPrecio(amount, user.name)) { //If price of product can be updated with bid
+            if (infoProd.updatePrice(amount, user.name)) { //If price of product can be updated with bid
 
-                bidHistory.add(new Bid(user.name, infoProd.name, infoProd.currentPrice)); //Adds to history about new change made
+                bidHistory.add(new Bid(user.name, infoProd.getName(), infoProd.getCurrentPrice())); //Adds to history about new change made
                 this.updateClients(); //Updates all clients about the update done.
                 return true;
 
@@ -267,7 +267,7 @@ public class AuctionServer implements Server {
             try {
                 //Compare the user of the current Controller with the name of client to notify
                 if(c.getUser().equalsIgnoreCase(notify)) { //If they're equal
-                    User client = users.get(prod.lastBidder); //Get the client that made the last bid
+                    User client = users.get(prod.getLastBidder()); //Get the client that made the last bid
                     c.notifyEndBid(client, prod); //Notify client of this client.
                 }
             }

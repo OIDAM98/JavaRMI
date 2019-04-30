@@ -14,48 +14,93 @@ import java.time.format.DateTimeFormatter;
 
 public class Product implements Serializable {
 
-    String seller;
-    String lastBidder;
-    String name;
-    String description;
-    float firstPrice;
-    float currentPrice;
-    LocalDateTime closingDate;
+    private String seller;
+    private String lastBidder;
+    private String name;
+    private String description;
+    private float initialPrice;
+    private float currentPrice;
+    private LocalDateTime closingDate;
     private boolean isActive;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    /*
+    Creates a new product with the seller, the name, the description, the price and its closing date provided
+     */
+    public Product(String s, String n, String d, float price, LocalDateTime cd ) {
 
-    public Product(String v, String p, String d, float pi, LocalDateTime fc ) {
-
-        seller = v;
-        lastBidder = v;
-        name = p;
+        seller = s;
+        lastBidder = s;
+        name = n;
         description = d;
-        firstPrice = pi;
-        currentPrice = pi;
-        closingDate = fc;
+        initialPrice = price;
+        currentPrice = price;
+        closingDate = cd;
         isActive = true;
 
     }
 
-    public boolean actualizaPrecio( float monto, String user ) {
+    /*
+    Updates the price of the product.
+    - Checks if the new price is greater than the current price.
+        - If true, updates the price and who made the last bid, and return true
+        - Else, return false
+     */
+    public boolean updatePrice(float amount, String user ) {
 
-        if( monto > currentPrice) {
-            currentPrice = monto;
+        if( amount > currentPrice) { //If new price is greater than current one
+            //Update current price and last bidder
+            currentPrice = amount;
             lastBidder = user;
             return true;
         } else
             return false;
     }
 
-    public String getNombreProducto() {
+    /*
+    Returns this product's seller
+     */
+    public String getSeller() {
+        return seller;
+    }
 
+    /*
+    Returns this product's last bidder
+     */
+    public String getLastBidder() {
+        return lastBidder;
+    }
+
+    /*
+    Returns this product's name
+     */
+    public String getName() {
         return name;
     }
 
-    public float getCurrentPrice() {
+    /*
+    Returns this product's description
+     */
+    public String getDescription() {
+        return description;
+    }
 
+    /*
+    Returns this product's initial price
+     */
+    public float getInitialPrice() {
+        return initialPrice;
+    }
+
+    /*
+    Returns this product's current price
+     */
+    public float getCurrentPrice() {
         return currentPrice;
+    }
+
+    public LocalDateTime getClosingDate() {
+        return closingDate;
     }
 
     public boolean isActive() {

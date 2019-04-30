@@ -284,7 +284,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
         view.resetProductList(); //Reinitialize the products shown on View
 
         catalog.forEach(prod -> { //For each product
-            listDescription.put(prod.name, prod.description); //Put the name of product and its description on the list
+            listDescription.put(prod.getName(), prod.getDescription()); //Put the name of product and its description on the list
             view.addProduct(prod); //Add product to View to be displayed
         });
 
@@ -306,7 +306,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
             float amount = view.getAmountBid(); //Get the amount to be offered on this product
             String user = view.getCurrentUser(); //Get current user on View
 
-            model.addOffer(user, offer.name, amount); //Add the offer on the server
+            model.addOffer(user, offer.getName(), amount); //Add the offer on the server
         }
         catch (IllegalArgumentException ex) {//If there was an error on the introduced amount to offer
             //Displays the user the message of the error caught.
@@ -331,7 +331,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
     public void changeDescription(Product item) {
         if (item != null) { //If item is not null
             System.out.println(item); //Prints item information
-            String context = listDescription.get(item.name); //Gets description from list of descriptions
+            String context = listDescription.get(item.getName()); //Gets description from list of descriptions
             view.showDescription(context); //Display this description on View
         }
     }
@@ -377,7 +377,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
             //Header panel
             JPanel north = new JPanel();
             north.setLayout(new GridLayout(2, 1));
-            north.add(new JLabel("Subasta para el name" + p.name + " finalizó con exito!")); //Shows the product bought
+            north.add(new JLabel("Subasta para el name" + p.getName() + " finalizó con exito!")); //Shows the product bought
             north.add(new JLabel("Datos del comprador:"));
             panel.add(north, BorderLayout.NORTH); //Adds this panel to the main one.
 
@@ -393,7 +393,7 @@ public class AuctionController extends UnicastRemoteObject implements Controller
         else { //If the highest bid was made by the current user
             //Inform the user that he/she was the highest bidder
             JOptionPane.showConfirmDialog(null,
-                    "Usted quien ofrecio más por " + p.name,
+                    "Usted quien ofrecio más por " + p.getName(),
                     "Datos del comprador",
                     JOptionPane.OK_OPTION);
         }
