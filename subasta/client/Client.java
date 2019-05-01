@@ -1,4 +1,6 @@
-package subasta;
+package subasta.client;
+
+import subasta.common.Product;
 
 import javax.swing.*;
 import java.awt.*;
@@ -153,7 +155,7 @@ public class Client {
         userPanel.add(new JLabel("Nickname:"));
         userPanel.add(nicknameField);
 
-        userPanel.setPreferredSize(new Dimension(300, 450));
+        userPanel.setPreferredSize(new Dimension(300, 150));
     }
 
     /**
@@ -355,6 +357,12 @@ public class Client {
         return resultado;
     }
 
+    /**
+     * Returns the nickname of the client that is connected.
+     *     - Retrieves and returns user from {@code nicknameField}.
+     * @return the name of the client
+     * @throws IllegalArgumentException if {@code nicknameField} text is empty
+     */
     public String getNickname() throws IllegalArgumentException {
         String txt = nicknameField.getText(); //Fetches text from nicknameField
         //If field was left empty throw a new exception since this field cannot be left empty
@@ -505,7 +513,6 @@ public class Client {
         //If parsing was made without any error, return parsed value
         return resultado;
     }
-
 
     /**
      * Returns the hour of the product's offer limit date,

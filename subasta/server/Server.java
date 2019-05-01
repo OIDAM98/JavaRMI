@@ -1,4 +1,8 @@
-package subasta;
+package subasta.server;
+
+import subasta.common.Controller;
+import subasta.common.Product;
+import subasta.common.User;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

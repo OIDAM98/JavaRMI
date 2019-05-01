@@ -1,4 +1,9 @@
-package subasta;
+package subasta.server;
+
+import subasta.common.Bid;
+import subasta.common.Controller;
+import subasta.common.Product;
+import subasta.common.User;
 
 import java.io.FileWriter;
 import java.io.IOException;

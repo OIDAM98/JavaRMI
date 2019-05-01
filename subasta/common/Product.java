@@ -1,4 +1,4 @@
-package subasta;
+package subasta.common;
 
 /**
  * Information about products on sale:

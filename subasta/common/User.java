@@ -1,4 +1,4 @@
-package subasta;
+package subasta.common;
 
 import java.io.Serializable;
 

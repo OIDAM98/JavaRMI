@@ -1,4 +1,9 @@
-package subasta;
+package subasta.client;
+
+import subasta.common.Controller;
+import subasta.common.Product;
+import subasta.common.User;
+import subasta.server.Server;
 
 import java.awt.*;
 import java.rmi.NotBoundException;

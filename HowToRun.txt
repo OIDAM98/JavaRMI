@@ -1,9 +1,12 @@
-1) Estar dentro del directorio SUBASTA
+1) Estar dentro del directorio JavaRMI.
 2) Compilar usando el siguiente comando:
-    javac -d . subasta/*.java
+    javac -d . subasta/*/*.java
 3) Levantar el servidor de nombres:
     rmiregistry
 4) Ejecutar el servidor:
-    java -Djava.rmi.server.codebase=file:/RMI/ subasta.SubastaModelo
+    java -Djava.rmi.server.codebase=file:/RMI/ subasta.server.AuctionServer
 5) Ejecutar el cliente
-    java subasta.SubastaVista
+    java subasta.client.Client
+
+El proyecto se corrió dentro de Linux,
+las instrucciones aplican para sistemas operaetivos basados en Unix.
